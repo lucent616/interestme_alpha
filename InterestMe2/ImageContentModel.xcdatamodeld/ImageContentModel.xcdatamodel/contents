@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5063" systemVersion="12F45" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13D65" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Polaroid" representedClassName="Polaroid" syncable="YES">
         <attribute name="boringToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="genre" optional="YES" attributeType="String" syncable="YES"/>
@@ -13,24 +13,24 @@
         <attribute name="savedByMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="sentByMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="wasBoringToThisUser" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="userWasInterestedByThisPolaroid" inverseEntity="User" syncable="YES"/>
-        <relationship name="wasInterestingToThisUser" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="userSentThisPolaroid" inverseEntity="User" syncable="YES"/>
-        <relationship name="wasSavedByThisUser" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="userSavedThisPolaroid" inverseEntity="User" syncable="YES"/>
-        <relationship name="wasSentByThisUser" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="userWasBoredByThisPolaroid" inverseEntity="User" syncable="YES"/>
+        <relationship name="allUsersBoredByThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsInterestingToThisUser" inverseEntity="User" syncable="YES"/>
+        <relationship name="allUsersInterestedByThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsSentByThisUser" inverseEntity="User" syncable="YES"/>
+        <relationship name="allUsersThatSavedThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsSavedByThisUser" inverseEntity="User" syncable="YES"/>
+        <relationship name="allUsersThatSentThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsBoringToThisUser" inverseEntity="User" syncable="YES"/>
     </entity>
-    <entity name="User" syncable="YES">
+    <entity name="User" representedClassName="User" syncable="YES">
         <attribute name="address" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="password" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="userSavedThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="wasSavedByThisUser" inverseEntity="Polaroid" syncable="YES"/>
-        <relationship name="userSentThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="wasInterestingToThisUser" inverseEntity="Polaroid" syncable="YES"/>
-        <relationship name="userWasBoredByThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="wasSentByThisUser" inverseEntity="Polaroid" syncable="YES"/>
-        <relationship name="userWasInterestedByThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="wasBoringToThisUser" inverseEntity="Polaroid" syncable="YES"/>
+        <relationship name="allPolaroidsBoringToThisUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="allUsersThatSentThisPolaroid" inverseEntity="Polaroid" syncable="YES"/>
+        <relationship name="allPolaroidsInterestingToThisUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="allUsersBoredByThisPolaroid" inverseEntity="Polaroid" syncable="YES"/>
+        <relationship name="allPolaroidsSavedByThisUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="allUsersThatSavedThisPolaroid" inverseEntity="Polaroid" syncable="YES"/>
+        <relationship name="allPolaroidsSentByThisUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="allUsersInterestedByThisPolaroid" inverseEntity="Polaroid" syncable="YES"/>
     </entity>
     <elements>
         <element name="Polaroid" positionX="-9" positionY="-106" width="252" height="283"/>
-        <element name="User" positionX="-477" positionY="-153" width="252" height="178"/>
+        <element name="User" positionX="-432" positionY="-117" width="252" height="178"/>
     </elements>
 </model>
