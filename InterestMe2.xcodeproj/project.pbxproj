@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4E334C33193FB01700974A26 /* SettingsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E334C32193FB01700974A26 /* SettingsTVC.m */; };
+		4E2021F4196135D800F467E9 /* SettingsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2021F2196135D800F467E9 /* SettingsTVC.m */; };
 		4E334C44193FB07C00974A26 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E334C43193FB07C00974A26 /* main.m */; };
 		4E334C4A193FB33D00974A26 /* ImageContentModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4E334C48193FB33D00974A26 /* ImageContentModel.xcdatamodeld */; };
 		4E334C4C193FDB3D00974A26 /* interestMe_logo2_58.png in Resources */ = {isa = PBXBuildFile; fileRef = 4E334C4B193FDB3D00974A26 /* interestMe_logo2_58.png */; };
@@ -95,8 +95,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4E334C31193FB01700974A26 /* SettingsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTVC.h; sourceTree = "<group>"; };
-		4E334C32193FB01700974A26 /* SettingsTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTVC.m; sourceTree = "<group>"; };
+		4E2021F2196135D800F467E9 /* SettingsTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTVC.m; sourceTree = "<group>"; };
+		4E2021F3196135D800F467E9 /* SettingsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTVC.h; sourceTree = "<group>"; };
 		4E334C43193FB07C00974A26 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4E334C46193FB09900974A26 /* InterestMe2-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "InterestMe2-Prefix.pch"; sourceTree = "<group>"; };
 		4E334C49193FB33D00974A26 /* ImageContentModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ImageContentModel.xcdatamodel; sourceTree = "<group>"; };
@@ -232,7 +232,6 @@
 			children = (
 				4E46E28119380585009A5FFF /* View Controllers */,
 				4E9DCFDB19423F5B000C4C2F /* Collection Controller */,
-				4E46E2821938059B009A5FFF /* Table Controllers */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -244,18 +243,11 @@
 				4E5EA0C618F7521D00219035 /* DraggableViewController.m */,
 				4E66A793191B122E008599C5 /* FullScreenViewController.h */,
 				4E66A794191B122E008599C5 /* FullScreenViewController.m */,
+				4E2021F2196135D800F467E9 /* SettingsTVC.m */,
+				4E2021F3196135D800F467E9 /* SettingsTVC.h */,
 				4E9E7298193D341800F1A6C2 /* View Objects */,
 			);
 			name = "View Controllers";
-			sourceTree = "<group>";
-		};
-		4E46E2821938059B009A5FFF /* Table Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				4E334C31193FB01700974A26 /* SettingsTVC.h */,
-				4E334C32193FB01700974A26 /* SettingsTVC.m */,
-			);
-			name = "Table Controllers";
 			sourceTree = "<group>";
 		};
 		4E5EA0A418F7521D00219035 = {
@@ -670,7 +662,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4EB9398D195C67E600E17FE8 /* Polaroid.m in Sources */,
-				4E334C33193FB01700974A26 /* SettingsTVC.m in Sources */,
 				4EC98DA31943E60600EDE129 /* PolaroidDatabase.m in Sources */,
 				4E9DCFE019423F7A000C4C2F /* PolaroidCollectionViewCell.m in Sources */,
 				4E9DCFE119423F7A000C4C2F /* PolaroidCollectionViewController.m in Sources */,
@@ -683,6 +674,7 @@
 				4E334C44193FB07C00974A26 /* main.m in Sources */,
 				4EB93996195CAEFB00E17FE8 /* DrawerVertical.m in Sources */,
 				4EB93993195C729B00E17FE8 /* TestVC.m in Sources */,
+				4E2021F4196135D800F467E9 /* SettingsTVC.m in Sources */,
 				4EC98DA71943E66D00EDE129 /* FlickrFetcher.m in Sources */,
 				4E46E27E19369819009A5FFF /* Polaroid+AddOn.m in Sources */,
 				4EC98DAA1943E6FD00EDE129 /* CoreDataTableViewController.m in Sources */,

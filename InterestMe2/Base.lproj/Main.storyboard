@@ -114,62 +114,6 @@
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <view opaque="NO" tag="9" contentMode="scaleToFill" id="aRX-8F-SjG">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="wAE-jT-CVI">
-                                        <rect key="frame" x="-12" y="-19" width="344" height="607"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    </imageView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="y6E-6H-3Ws">
-                                        <rect key="frame" x="-3" y="201" width="93" height="100"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" image="sms_icon.png">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="sendImageViaSMSButton" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Q3k-TY-XjF"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Cyv-Qm-Em2">
-                                        <rect key="frame" x="75" y="201" width="92" height="100"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" image="mail_icon.png">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="sendImageViaEmailButton" destination="vXZ-lx-hvc" eventType="touchUpInside" id="b7b-tg-2wK"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="l4U-q8-w2H">
-                                        <rect key="frame" x="152" y="201" width="93" height="100"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" image="twitter_icon.png">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="bxL-9q-vtg">
-                                        <rect key="frame" x="230" y="201" width="93" height="100"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" image="fb_icon.png">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Tfu-Hv-hcK">
-                                        <rect key="frame" x="137" y="469" width="46" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" title="Button">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="menuButton:" destination="Kio-f5-pu1" eventType="touchUpInside" id="F0m-Hq-yy3"/>
-                                            <action selector="menuButton:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="FzS-Kj-3o2"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <gestureRecognizers/>
@@ -191,9 +135,6 @@
                         <outlet property="backPolaroidCardView" destination="FnS-9A-jVM" id="iRR-Q6-H4b"/>
                         <outlet property="backPolaroidDescription" destination="MfT-Qi-9X6" id="mmM-Zf-Ca8"/>
                         <outlet property="backPolaroidTitle" destination="esJ-Ge-OSE" id="9Jk-3d-UQr"/>
-                        <outlet property="blurredImage" destination="wAE-jT-CVI" id="5rZ-1H-DLX"/>
-                        <outlet property="drawerSelectionTestButton" destination="Tfu-Hv-hcK" id="a2b-gY-xOh"/>
-                        <outlet property="drawerView" destination="aRX-8F-SjG" id="Ais-xo-dk0"/>
                         <outlet property="friendScoreLabel" destination="bdm-zR-tY1" id="X1G-h7-zqa"/>
                         <outlet property="frontPolaroidCardView" destination="nlP-RK-lmI" id="6PX-A1-GN1"/>
                         <outlet property="frontPolaroidDescription" destination="Zga-Nc-h6U" id="Owt-aL-XtA"/>
