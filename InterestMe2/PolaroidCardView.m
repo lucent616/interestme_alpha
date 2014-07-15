@@ -8,9 +8,10 @@
 
 #import "PolaroidCardView.h"
 #import "DraggableViewController.h"
+#import "UIImage+AddOn.h"
 
 @interface PolaroidCardView()
-@property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) UIImageView *polaroidImageView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 
 
@@ -28,21 +29,24 @@
 
 #pragma mark Properties
 
-- (UIImageView *)imageView
+- (UIImageView *)polaroidImageView
 {
-    if (!_imageView) _imageView = [[UIImageView alloc] init];
-    return _imageView;
+    if (!_polaroidImageView) _polaroidImageView = [[UIImageView alloc] init];
+    return _polaroidImageView;
 }
 
 - (UIImage *)image
 {
-    return self.imageView.image;
+    return self.polaroidImageView.image;
 }
 
 - (void)setImage:(UIImage *)image
 {
-    self.imageView.image = image;
-    [self.imageView sizeToFit];
+    self.polaroidImageView.image = image;
+    self.title.text = self.polaroid.title;
+    self.description.text = self.polaroid.polaroidDescription;
+
+    [self.polaroidImageView sizeToFit];
     [self.spinner stopAnimating];
 }
 
@@ -52,7 +56,6 @@
 - (void)startDownloadingImage
 {
     self.image = nil;
-    //NSLog(@"url: %@", self.polaroid.imageURL);
     if (self.polaroid.imageURL)
     {
         [self.spinner startAnimating];
@@ -66,7 +69,6 @@
             {
                 if ([[request.URL absoluteString] isEqual:self.polaroid.imageURL])
                 {
-                    //NSLog(@"url: %@", self.polaroid.imageURL);
                     self.polaroid.image = [NSData dataWithContentsOfURL:localfile];
                     UIImage *image = [UIImage imageWithData:self.polaroid.image];
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -81,7 +83,6 @@
     }
 }
 
-
 - (CGFloat)cornerScaleFactor { return self.bounds.size.height / CORNER_FONT_STANDARD_HEIGHT; }
 - (CGFloat)cornerRadius { return CORNER_RADIUS * [self cornerScaleFactor]; }
 - (CGFloat)cornerOffset { return [self cornerRadius] / 3.0; }
@@ -89,46 +90,19 @@
 //DRAWS A POLAROID
 - (void)drawRect:(CGRect)rect
 {
-//    UITapGestureRecognizer *tapRecognizer;
-//    tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(foundTap:)];
-//    tapRecognizer.numberOfTapsRequired = 1;
-//    tapRecognizer.numberOfTouchesRequired = 1;
+    CGSize targetSize = CGSizeMake(self.bounds.size.width* POLAROID_WIDTH_SCALE, self.bounds.size.height*POLAROID_HEIGHT_SCALE);
     
     
-    //Determines how the Polaroids are drawn
-    BOOL polaroidStyle = YES;
-    //Trying to incorporate threading results
+    //UIImage *polaroidImage = [self imageByScalingAndCroppingForSize:self.polaroidImage targetSize:targetSize];//WHERE I WANT TO TRY THE NEW RESIZING METHOD
+    UIImage *polaroidImage = [UIImage imageToFitSize:self.polaroidImage size:targetSize method:MGImageResizeCrop];
+    CGRect imageRect = self.bounds;
+    imageRect.size.width = self.bounds.size.width * POLAROID_WIDTH_SCALE; //sets the image width to be the same as the view bounds
+    imageRect.size.height = self.bounds.size.height * POLAROID_HEIGHT_SCALE;
+    float offsetValue = (self.bounds.size.width-imageRect.size.width)/2;
     
-    UIImage *polaroidImage = self.polaroidImage;
-        //UIImage *polaroidImage = [UIImage imageNamed:self.polaroidImageFileName];
-    if (polaroidImage) {
-            if (polaroidStyle)
-            {
-                //Polaroid style
-                CGRect imageRect = self.bounds;
-                imageRect.size.width = self.bounds.size.width * POLAROID_WIDTH_SCALE; //set the image width to be the same as the view bounds
-                imageRect.size.height = self.bounds.size.height * POLAROID_HEIGHT_SCALE;
-                float offsetValue = (self.bounds.size.width-imageRect.size.width)/2;
-                
-                CGRect movedImageRect =  CGRectOffset (imageRect, offsetValue, offsetValue);
-                [polaroidImage drawInRect:movedImageRect];
-            }
-            else
-            {
-                //Trading Card style
-                CGRect imageRect = self.bounds;
-                float scaledHeight = (polaroidImage.size.width/self.bounds.size.width)*polaroidImage.size.height;//calculate the proportionate scaling of the image
-                if (scaledHeight > self.bounds.size.height)
-                {
-                     imageRect.size.height = POLAROID_HEIGHT_SCALE * self.bounds.size.height;
-                    [polaroidImage drawInRect:imageRect];
-                }
-                else
-                {
-                    [polaroidImage drawInRect:imageRect];
-                }
-            }
-    }
+    CGRect movedImageRect =  CGRectOffset (imageRect, offsetValue, offsetValue);
+    [polaroidImage drawInRect:movedImageRect];
+    
 }
 
 - (void)setup
@@ -170,6 +144,73 @@
         [self setup];
     }
     return self;
+}
+
+//////////////////////////OLD RESIZING CODE
+- (UIImage*)imageByScalingAndCroppingForSize:(UIImage *)sourceImage targetSize:(CGSize)targetSize
+{
+    UIImage *newImage = nil;
+    CGSize imageSize = sourceImage.size;
+    CGFloat width = imageSize.width;
+    CGFloat height = imageSize.height;
+    CGFloat targetWidth = targetSize.width;
+    CGFloat targetHeight = targetSize.height;
+    CGFloat scaleFactor = 0.0;
+    CGFloat scaledWidth = targetWidth;
+    CGFloat scaledHeight = targetHeight;
+    CGPoint thumbnailPoint = CGPointMake(0.0,0.0);
+    
+    if (CGSizeEqualToSize(imageSize, targetSize) == NO)
+    {
+        CGFloat widthFactor = targetWidth / width;
+        CGFloat heightFactor = targetHeight / height;
+        
+        if (widthFactor > heightFactor)
+        {
+            scaleFactor = widthFactor; // scale to fit height
+        }
+        else
+        {
+            scaleFactor = heightFactor; // scale to fit width
+        }
+        
+        scaledWidth  = width * scaleFactor;
+        scaledHeight = height * scaleFactor;
+        
+        // center the image
+        if (widthFactor > heightFactor)
+        {
+            thumbnailPoint.y = (targetHeight - scaledHeight) * 0.5;
+        }
+        else
+        {
+            if (widthFactor < heightFactor)
+            {
+                thumbnailPoint.x = (targetWidth - scaledWidth) * 0.5;
+            }
+        }
+    }
+    
+    UIGraphicsBeginImageContext(targetSize); // this will crop
+    
+    CGRect thumbnailRect = CGRectZero;
+    thumbnailRect.origin = thumbnailPoint;
+    thumbnailRect.size.width  = scaledWidth;
+    thumbnailRect.size.height = scaledHeight;
+    
+    [sourceImage drawInRect:thumbnailRect];
+    
+    newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    if(newImage == nil)
+    {
+        NSLog(@"could not scale image");
+    }
+    
+    //pop the context to get back to the default
+    UIGraphicsEndImageContext();
+    
+    return newImage;
 }
 
 

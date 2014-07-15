@@ -8,13 +8,15 @@
 
 #import "FullScreenViewController.h"
 #import "DraggableViewController.h"
+#import "myWebView.h"
 
 @interface FullScreenViewController () <UIScrollViewDelegate>
 @property (nonatomic, strong) UIImageView *imageView;
 @property (strong, nonatomic) UIImage *image;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
-@property (strong, nonatomic) IBOutlet UITapGestureRecognizer *tapGR;
+@property (weak, nonatomic) IBOutlet UILabel *fullScreenTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *fullScreenDescriptionLabel;
 
 @end
 
@@ -35,10 +37,40 @@
 
 - (void)setImage:(UIImage *)image
 {
-    self.imageView.image = image;
-    [self.imageView sizeToFit];
-    self.scrollView.contentSize = self.image ? self.image.size : CGSizeZero;
+    // self.scrollView could be nil here if outlet-setting has not happened yet
+    self.scrollView.zoomScale = 1;
+    self.imageView.frame = CGRectMake(0, 0, image.size.width, image.size.height);
+    self.scrollView.contentSize = image ? image.size : CGSizeZero;
+    if(image)
+    {
+        //NSLog(@"Content Size: %f, %f",self.scrollView.contentSize.width, self.scrollView.contentSize.height);
+        self.imageView.image = image; // does not change the frame of the UIImageView
+        [self.imageView sizeToFit];   // update the frame of the UIImageView
+        
+        CGFloat actualScrollViewWidth = self.scrollView.contentSize.width;
+        CGFloat actualScrollViewHeight = self.scrollView.contentSize.height;
+        CGFloat scrollVisibleHeight = _scrollView.bounds.size.height;
+        CGFloat scrollVisibleWidth = _scrollView.bounds.size.width;
+        CGFloat heightRatio = scrollVisibleHeight / actualScrollViewHeight;
+        CGFloat widthRatio = scrollVisibleWidth/actualScrollViewWidth;
+//        NSLog(@"%f",heightRatio);
+//        NSLog(@"%f",widthRatio);
+//        NSLog(@"Window Size: %f, %f",scrollVisibleWidth, scrollVisibleHeight);
+//        NSLog(@"before: %f",self.scrollView.zoomScale);
+        
+        if (heightRatio > widthRatio)
+        {
+            self.scrollView.zoomScale = heightRatio;
+        }
+        else
+        {
+            self.scrollView.zoomScale = widthRatio;
+        }
+        //NSLog(@"after: %f",self.scrollView.zoomScale);
+        
+    }
     [self.spinner stopAnimating];
+    
 }
 
 #pragma mark Public API
@@ -55,7 +87,7 @@
 {
     self.image = nil;
     if (self.imageURL)
-{
+    {
         [self.spinner startAnimating];
         NSURLRequest *request = [NSURLRequest requestWithURL:self.imageURL];
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
@@ -82,8 +114,8 @@
 {
     _scrollView = scrollView;
     self.scrollView.delegate = self;
-    self.scrollView.minimumZoomScale = 0.2;
-    self.scrollView.maximumZoomScale = 1.0;
+    self.scrollView.minimumZoomScale = .5;
+    self.scrollView.maximumZoomScale = 3.0;
     self.scrollView.contentSize = self.image ? self.image.size : CGSizeZero;
 }
 
@@ -93,6 +125,23 @@
 {
     [super viewDidLoad];
     [self.scrollView addSubview:self.imageView];
+    self.fullScreenTitleLabel.text = self.fullScreenTitle;
+    self.fullScreenDescriptionLabel.text = self.fullScreenDescription;
+    
+    UITapGestureRecognizer *doubleTapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap)];
+    
+    UITapGestureRecognizer *singleTapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap)];
+    
+    [singleTapGR requireGestureRecognizerToFail : doubleTapGR];
+    [doubleTapGR setDelaysTouchesBegan : YES];
+    [singleTapGR setDelaysTouchesBegan : YES];
+    
+    [doubleTapGR setNumberOfTapsRequired : 2];
+    [singleTapGR setNumberOfTapsRequired : 1];
+    
+    [self.scrollView addGestureRecognizer : doubleTapGR];
+    [self.scrollView addGestureRecognizer : singleTapGR];
+    
 }
 
 #pragma mark UIScrollViewDelegate
@@ -102,10 +151,32 @@
     return self.imageView;
 }
 
-- (IBAction)tapOnFullScreenImage:(id)sender
+- (void)handleSingleTap
 {
-        [self.navigationController popViewControllerAnimated:YES];
-        [[self navigationController] setNavigationBarHidden:NO animated:NO];
+    NSLog(@"You SINGLE tapped on the screen");
+    [self.navigationController popViewControllerAnimated:YES];
+    [[self navigationController] setNavigationBarHidden:NO animated:NO];
+}
+
+- (void)handleDoubleTap
+{
+    NSLog(@"You DOUBLE tapped on the screen");
+    
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
+    myWebView *controller = (myWebView*)[mainStoryboard instantiateViewControllerWithIdentifier: @"WebViewID"];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:controller];
+    navigationController.navigationBar.barStyle = UIBarStyleDefault;
+
+    
+    
+    controller.webViewURL = [NSURL URLWithString:self.fullScreenSourceURL];
+    
+    NSLog(@"hihi");
+    //[self.navigationController pushViewController:controller animated:YES];
+    
+    // present
+    [self presentViewController:navigationController animated:YES completion:nil];
+    
 
 }
 

@@ -7,9 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DraggableViewController.h"
+#import "Polaroid.h"
+#import "SettingsCDTVC.h"
 
 @interface CDWAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (weak, nonatomic) DraggableViewController *draggableViewController;
 
 @end

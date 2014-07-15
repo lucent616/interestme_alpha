@@ -41,6 +41,27 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    NSUserDefaults *indexDefault = [NSUserDefaults standardUserDefaults];
+    
+    //PolaroidCardView *frontViewedPolaroidCardView = self.draggableViewController.frontPolaroidCardView;
+    //PolaroidCardView *middleViewedPolaroidCardView = self.draggableViewController.middlePolaroidCardView;
+    //PolaroidCardView *backViewedPolaroidCardView = self.draggableViewController.backPolaroidCardView;
+    NSNumber *lastInterestMeScore = [NSNumber numberWithInt:self.draggableViewController.interestMeScore];
+    NSNumber *imageIndexObject = [NSNumber numberWithInt:(self.draggableViewController.imageIndex - 2.0)];
+    NSMutableDictionary *recentFilterBank = self.draggableViewController.filterBank;
+    
+    NSDictionary *savedUserInfo = @{@"index":imageIndexObject,
+                                    //@"thumbnailButtonImage":self.draggableViewController.polaroidThumbnailImage,
+                                    //@"polaroidThumbnailImageURL":self.draggableViewController.polaroidThumbnailImageURL,
+                                        //@"frontPolaroid":frontViewedPolaroidCardView,
+                                        //@"middlePolaroid":middleViewedPolaroidCardView,
+                                        //@"backPolaroid":backViewedPolaroidCardView,
+                                        @"lastViewedInterestMeScore":lastInterestMeScore,
+                                        @"filterBank":recentFilterBank};
+    
+    [indexDefault setObject:savedUserInfo forKey:@"savedUserInfo"];
+    [indexDefault synchronize];
+    NSLog(@"Image Index %@ was saved when the application was terminated", imageIndexObject);
 }
 
 @end

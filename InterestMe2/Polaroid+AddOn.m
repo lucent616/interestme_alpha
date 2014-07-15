@@ -27,25 +27,33 @@ inManagedObjectContext:(NSManagedObjectContext *)context
     if (error || !matches || ([matches count] > 1)) {
         // handle error
     } else if (![matches count]) {
+        
         polaroid = [NSEntityDescription insertNewObjectForEntityForName:@"Polaroid"
                                               inManagedObjectContext:context];
         
-        polaroid.image = [[NSData alloc] init];//Call some function to download image from URL
-        polaroid.imageURL = [photoDictionary objectForKey:@"imageURL"];
-        polaroid.title = [photoDictionary objectForKey:@"title"];
-        polaroid.genre = [photoDictionary objectForKey:@"genre"];
+        polaroid.imageURL =[photoDictionary valueForKeyPath:@"image_url"];
+        polaroid.title = [photoDictionary valueForKeyPath:@"title"];
+        polaroid.polaroidDescription = [photoDictionary valueForKey:@"description"];
+        polaroid.genre = [photoDictionary valueForKey:@"genre"];
+        polaroid.polaroid_ID = [[photoDictionary valueForKey:@"id"] integerValue];
+        polaroid.sourceURL = [photoDictionary valueForKey:@"source_url"];
+        
+        
+                           
+        
+        //NSLog(@"Polaroid: %@", polaroid);
+
+        polaroid.image = [[NSData alloc] init];//Call some function to download image from URL?
         
         polaroid.interestingToMe = NO;
         polaroid.boringToMe = NO;
         polaroid.savedByMe = NO;
         polaroid.sentByMe = NO;
         
-        polaroid.numberOfPeopleBoredByThis = 0;
-        polaroid.numberOfPeopleInterestedInThis = 0;
-        polaroid.numberOfTimesSaved = 0;
-        polaroid.numberOfTimesSent = 0;
-
-        
+        polaroid.numberOfPeopleBoredByThis = [[photoDictionary valueForKey:@"boring_count"] intValue];
+        polaroid.numberOfPeopleInterestedInThis = [[photoDictionary valueForKey:@"interesting_count"] intValue];
+        polaroid.numberOfTimesSaved = [[photoDictionary valueForKey:@"saved_count"] intValue];
+        polaroid.numberOfTimesSent = [[photoDictionary valueForKey:@"sent_count"] intValue];
 
     } else {
         polaroid = [matches firstObject];

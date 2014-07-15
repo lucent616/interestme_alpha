@@ -11,15 +11,16 @@
 
 @interface PolaroidCardView : UIView
 
-//@property (strong, nonatomic) NSString *polaroidImageFileName;
-//@property (strong, nonatomic) NSURL *polaroidImageURL;
+
 @property (strong, nonatomic) Polaroid *polaroid;
 @property (strong, nonatomic) UIImage *polaroidImage;
+@property (strong, nonatomic) IBOutlet UILabel *title;
+@property (strong, nonatomic) IBOutlet UILabel *description;
 
 
 - (void)shadePolaroidBackground;
 - (void)unshadePolaroidBackground;
 - (void)startDownloadingImage;
-
+- (UIImage*)imageByScalingAndCroppingForSize:(UIImage *)sourceImage targetSize:(CGSize)targetSize;
 
 @end

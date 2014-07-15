@@ -9,5 +9,7 @@
 #import "FullScreenViewController.h"
 
 @interface PolaroidCollectionViewController : UICollectionViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+
 @property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
+
 @end
