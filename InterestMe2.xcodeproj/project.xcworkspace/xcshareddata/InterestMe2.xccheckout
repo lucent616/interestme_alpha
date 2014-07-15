@@ -14,9 +14,11 @@
 		<string>https://github.com/akjoshi87/interestme.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>InterestMe2/InterestMe2.xcodeproj/project.xcworkspace</string>
+	<string>InterestMe2.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>1B31008D-E655-4DA8-BC2F-0F4FB40272B3</key>
+		<string>../..</string>
 		<key>FC591BC0-DD59-4B44-AA08-514AFA620CF8</key>
 		<string>../../..</string>
 	</dict>
@@ -25,7 +27,7 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>FC591BC0-DD59-4B44-AA08-514AFA620CF8</string>
+	<string>1B31008D-E655-4DA8-BC2F-0F4FB40272B3</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -35,6 +37,14 @@
 			<string>FC591BC0-DD59-4B44-AA08-514AFA620CF8</string>
 			<key>IDESourceControlWCCName</key>
 			<string>interestme</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>1B31008D-E655-4DA8-BC2F-0F4FB40272B3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>InterestMe2</string>
 		</dict>
 	</array>
 </dict>
