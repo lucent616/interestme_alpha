@@ -18,6 +18,7 @@
 #import "LoginViewController.h"
 #import "CDWAppDelegate.h"
 #import "OverlayView.h"
+#import "myWebView.h"
 
 
 @interface DraggableViewController ()
@@ -54,6 +55,7 @@
 
 @property (strong, nonatomic) UIPanGestureRecognizer *panGR;
 @property (strong, nonatomic) UITapGestureRecognizer *tapGR;
+@property (strong, nonatomic)  UITapGestureRecognizer *doubleTapGR;
 @property (strong, nonatomic) NSData *imageData;
 @property (nonatomic) CGPoint panPoint;
 @property (nonatomic) CGPoint originalPoint;
@@ -468,8 +470,18 @@ static int xSensitivity = 40;
     
     self.panGR = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragPolaroid:)];
     self.tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPolaroidView:)];
+    self.tapGR.numberOfTapsRequired = 1;
+    [self.tapGR setDelaysTouchesBegan : YES];
+    
+    self.doubleTapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapPolaroidView:)];
+    self.doubleTapGR.numberOfTapsRequired = 2;
+    [self.doubleTapGR setDelaysTouchesBegan : YES];
+    
+    [self.tapGR requireGestureRecognizerToFail:self.doubleTapGR];
+    
     [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
     [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
+    [self.frontPolaroidCardView addGestureRecognizer:self.doubleTapGR];
     [self.frontPolaroidCardView shadePolaroidBackground];
     self.currentPolaroidImageURL = self.frontPolaroidCardView.polaroid.imageURL;
 
@@ -549,6 +561,7 @@ static int xSensitivity = 40;
         [self.frontPolaroidCardView shadePolaroidBackground];
         [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
         [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
+        [self.frontPolaroidCardView addGestureRecognizer:self.doubleTapGR];
         //NSLog(@"Genre of Current Polaroid: %@", self.frontPolaroidCardView.polaroid.genre);
     }
     else if (self.imageIndex == [self.photoBank count])
@@ -575,6 +588,7 @@ static int xSensitivity = 40;
         [self.frontPolaroidCardView shadePolaroidBackground];
         [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
         [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
+        [self.frontPolaroidCardView addGestureRecognizer:self.doubleTapGR];
     }
 }
 
@@ -793,7 +807,7 @@ static int xSensitivity = 40;
 
 }
 
-- (void) tapPolaroidView:(id)sender
+- (void)tapPolaroidView:(id)sender
 {
     FullScreenViewController *ivc = [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"FullScreenViewID"];
     [[self navigationController] setNavigationBarHidden:YES animated:NO];
@@ -804,6 +818,22 @@ static int xSensitivity = 40;
     ivc.fullScreenSourceURL = self.currentPolaroidSourceURL;
  
     [self.navigationController pushViewController:ivc animated:YES];
+}
+
+- (void)doubleTapPolaroidView:(id)sender
+{
+    NSLog(@"Polaroid View was Double Tapped!");
+    
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
+    myWebView *controller = (myWebView*)[mainStoryboard instantiateViewControllerWithIdentifier: @"WebViewID"];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:controller];
+    navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    
+    controller.webViewURL = [NSURL URLWithString:self.frontPolaroidCardView.polaroid.sourceURL];
+    
+    // present
+    [self presentViewController:navigationController animated:YES completion:nil];
+    
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
