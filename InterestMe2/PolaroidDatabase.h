@@ -22,4 +22,5 @@
 - (void)fetchWithCompletionHandler:(void (^)(BOOL success))completionHandler;
 
 
+
 @end

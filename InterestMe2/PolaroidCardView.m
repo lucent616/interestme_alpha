@@ -9,11 +9,12 @@
 #import "PolaroidCardView.h"
 #import "DraggableViewController.h"
 #import "UIImage+AddOn.h"
+#import "OverlayView.h"
 
 @interface PolaroidCardView()
 @property (nonatomic, strong) UIImageView *polaroidImageView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
-
+@property (nonatomic, strong) UIImageView *imageView;
 
 @end
 
@@ -29,6 +30,11 @@
 
 #pragma mark Properties
 
+- (void)didAddSubview:(UIView *)subview
+{
+    
+}
+
 - (UIImageView *)polaroidImageView
 {
     if (!_polaroidImageView) _polaroidImageView = [[UIImageView alloc] init];
@@ -43,9 +49,12 @@
 - (void)setImage:(UIImage *)image
 {
     self.polaroidImageView.image = image;
+    
     self.title.text = self.polaroid.title;
     self.description.text = self.polaroid.polaroidDescription;
+    
 
+    
     [self.polaroidImageView sizeToFit];
     [self.spinner stopAnimating];
 }
@@ -110,6 +119,11 @@
     self.backgroundColor = [UIColor whiteColor];
     self.opaque = NO;
     self.contentMode = UIViewContentModeRedraw;
+    
+    self.overlayView.backgroundColor = [UIColor whiteColor];
+    self.overlayView.alpha = 0;
+    self.imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"overlay_send.png"]];
+    [self.overlayView addSubview:self.imageView];
 }
 
 - (void)shadePolaroidBackground
@@ -130,6 +144,34 @@
     self.layer.shadowOpacity = 0.0;
 }
 
+- (void)hideOverlay
+{
+    [self updateOverlay:0 yDistance:0];
+}
+
+- (void)updateOverlay:(CGFloat)xDistance yDistance:(CGFloat)yDistance
+{
+    CGFloat distance;
+    if (yDistance < 0 && fabs(xDistance) < 70)
+    {
+        self.imageView.image = [UIImage imageNamed:@"overlay_send.png"];
+        distance = yDistance;
+    }
+    else if (xDistance > 0 && fabs(yDistance) < 300)
+    {
+        self.imageView.image = [UIImage imageNamed:@"overlay_interesting.png"];
+        distance = xDistance;
+        
+    }
+    else if (xDistance < 0 && fabs(yDistance) < 300)
+    {
+        self.imageView.image = [UIImage imageNamed:@"overlay_boring.png"];
+        distance = xDistance;
+    }
+    CGFloat overlayStrength = MIN(fabs(distance) / 100, 0.4);
+    self.overlayView.alpha = overlayStrength;
+}
+
 //END OF DRAWING POLAROID
 
 - (void)awakeFromNib
@@ -143,10 +185,10 @@
     if (self) {
         [self setup];
     }
+    
     return self;
 }
 
-//////////////////////////OLD RESIZING CODE
 - (UIImage*)imageByScalingAndCroppingForSize:(UIImage *)sourceImage targetSize:(CGSize)targetSize
 {
     UIImage *newImage = nil;

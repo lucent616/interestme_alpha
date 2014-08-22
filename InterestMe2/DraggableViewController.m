@@ -17,6 +17,7 @@
 #import "UIImage+AddOn.h"
 #import "LoginViewController.h"
 #import "CDWAppDelegate.h"
+#import "OverlayView.h"
 
 
 @interface DraggableViewController ()
@@ -27,20 +28,29 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *interestSettingsButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *interestBoardButton;
 @property (weak, nonatomic) IBOutlet UILabel *interestMeScoreLabel;
+@property (nonatomic) int friendScore;
 @property (weak, nonatomic) IBOutlet UILabel *friendScoreLabel;
-@property (strong, nonatomic) NSMutableArray *urlBank;
-@property (strong, nonatomic) IBOutlet UIView *globalView;
+@property (weak, nonatomic) IBOutlet UILabel *friendScoreDescription;
 
-@property (strong, nonatomic) UIImage *polaroidImage;
-@property (strong, nonatomic) NSURL *polaroidImageURL;
+@property (strong, nonatomic) IBOutlet UIView *globalView;
+@property (strong, nonatomic) NSMutableArray *urlBank;//May be unnecessary
+@property (strong, nonatomic) NSMutableData *webData;
+@property (nonatomic) int remainingPolaroids;
+
 @property (strong, nonatomic) NSString *currentPolaroidImageURL;
 @property (strong, nonatomic) NSString *currentPolaroidTitle;
 @property (strong, nonatomic) NSString *currentPolaroidDescription;
 @property (strong, nonatomic) NSString *currentPolaroidSourceURL;
+@property (nonatomic) int currentImageIndex;
 
+@property (strong, nonatomic) UIImage *polaroidImage;
+@property (strong, nonatomic) NSString *polaroidImageURL;
+@property (nonatomic) NSNumber *polaroidThumbnailID;
 @property (strong, nonatomic) NSString *polaroidThumbnailTitle;
 @property (strong, nonatomic) NSString *polaroidThumbnailDescription;
 @property (strong, nonatomic) NSString *polaroidThumbnailSourceURL;
+@property (strong, nonatomic) NSData *polaroidThumbnailImageData;
+@property (nonatomic) int thumbnailIndex;
 
 @property (strong, nonatomic) UIPanGestureRecognizer *panGR;
 @property (strong, nonatomic) UITapGestureRecognizer *tapGR;
@@ -50,20 +60,16 @@
 @property (nonatomic) CGAffineTransform originalTransform;
 @property (nonatomic) CGFloat xDistance;
 @property (nonatomic) CGFloat  yDistance;
-@property (nonatomic) int thumbnailIndex;
-
-@property (nonatomic) int friendScore;
 
 @property (strong, nonatomic) UIActivityViewController *activityViewController;
-
-@property (strong, nonatomic) NSMutableData *webData;
-@property (nonatomic) int userIdentification;
+@property (strong, nonatomic) NSDictionary *previousSessionInformation;
 @property (strong, nonatomic) NSDictionary *userInformation;
-@property (strong, nonatomic) NSDictionary *indexInformation;
-@property (nonatomic) int currentImageIndex;
-@property (strong, nonatomic) NSDictionary *shareMessageData;
+@property (nonatomic) int userIdentification;
+
 @property (strong, nonatomic) NSString  *shareMessage;
+@property (strong, nonatomic) NSDictionary *shareMessageData;
 @property (strong, nonatomic) Pinterest *pinterest;
+@property (strong, nonatomic) NSDictionary *userFilterPreferences;
 
 @end
 
@@ -82,54 +88,68 @@ static int xSensitivity = 40;
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedUserInfo"] != nil)
-    {
-        NSLog(@"IMAGE INDEX WAS PREVIOUSLY STORED!!!");
-        self.indexInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedUserInfo"];
-        self.imageIndex = [self.indexInformation[@"index"] intValue];
-        self.filterBank = self.indexInformation[@"filterBank"];
-        
-        
-        NSLog(@"Previously stored Image Index was: %d", self.imageIndex);
-    
-    }
-    else
-    {
-        _imageIndex = 0;
-        NSLog(@"No current Image Index found, Image Index was set to zero");
-    }
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     
-    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"userInfo"] != nil)
+    //Check to see if the user has joined the application already, Ideally this would be in ViewDidLoad, but need to figure out a dispatch strategy with ViewDidAppear
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Information From Server"] != nil)
     {
-        self.userInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"userInfo"];
-        self.userIdentification = [self.userInformation[@"id"] intValue];
-        //NSLog(@"User Identification: %d", self.userIdentification);
+        self.userInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Information From Server"];
+        self.userIdentification = [self.userInformation[@"userID"] intValue];
+        NSLog(@"This user has created an account");
+        NSLog(@"This users identification number is: %d", self.userIdentification);
+        //NSLog(@"%@",[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"][@"filterBank"]);
+
     }
     else
     {
+//       NSLog(@"This user has never created an account and needs to create one");
+//        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//        UIViewController *loginVC = [storyboard instantiateViewControllerWithIdentifier:@"LoginViewController"];
+//        loginVC.modalPresentationStyle = UIModalPresentationFullScreen;
+//        [self presentViewController:loginVC animated:YES completion:nil];
+        NSLog(@"This user has never created an account and needs to create one");
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        UIViewController *loginVC = [storyboard instantiateViewControllerWithIdentifier:@"LoginViewController"];
-        loginVC.modalPresentationStyle = UIModalPresentationFullScreen;
-        [self presentViewController:loginVC animated:YES completion:nil];
+        UIViewController *tutorialVC = [storyboard instantiateViewControllerWithIdentifier:@"TutorialViewController"];
+        tutorialVC.modalPresentationStyle = UIModalPresentationFullScreen;
+        [self presentViewController:tutorialVC animated:YES completion:nil];
+        
+    }
+    
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] != nil)
+    {
+        NSLog(@"User is continuing a previous session");
+        NSLog(@"Photo bank at startup: %@", self.photoBank);
+
+    }
+    else
+    {
+        NSLog(@"This is a new session for this user");
+        [self.friendScoreLabel setHidden:YES];
+        [self.friendScoreDescription setHidden:YES];
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-
-}
-
 - (void)viewDidLoad
-{
-    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"interestMeTitle.png"]];
-    
+{   //Creates MOC and if one has not been created, then it observes until a database is created
     [super viewDidLoad];
+    
+    
+    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"interestMe_Navigation_Header.png"]];
+    
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] == nil)
+    {
+        [self.friendScoreLabel setHidden:YES];
+        [self.friendScoreDescription setHidden:YES];
+    }
+    else
+    {
+
+    }
     
     CDWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
     appDelegate.draggableViewController = self;
@@ -140,33 +160,86 @@ static int xSensitivity = 40;
     if (polaroidDB.managedObjectContext)
     {
         self.managedObjectContext = polaroidDB.managedObjectContext;
+        
         [self stagePolaroids];
-        //NSLog(@"photoBanks: %@", self.photoBank);
+        //NSLog(@"photoBank: %@", self.photoBank);
 
-    } else
+    }
+    else
     {
         id observer = [[NSNotificationCenter defaultCenter] addObserverForName:PolaroidDatabaseAvailable
                                                                         object:polaroidDB
                                                                          queue:[NSOperationQueue mainQueue]
                                                                     usingBlock:^(NSNotification *note) {
                                                                         self.managedObjectContext = polaroidDB.managedObjectContext;
+                                                                        
                                                                         [self stagePolaroids];
-                                                                        //NSLog(@"photoBanks: %@", self.photoBank);
+                                                                        NSLog(@"Inside the MOC Block");
+                                                                        
+                                                                        //Retrieve thumbnail information from previous session
+                                                                        if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] != nil)
+                                                                        {
+                                                                            self.previousSessionInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"];
+                                                                            
+                                                                            self.polaroidThumbnailID = self.previousSessionInformation[@"thumbnailPolaroidID"];
+                                                                            self.friendScore = [self.previousSessionInformation[@"lastViewedFriendScore"] intValue];
+                                                                            NSLog(@"Friend score from previous session: %d", self.friendScore);
+                                                                            NSLog(@"Polaroid Thumbnail ID from previous session: %@", self.polaroidThumbnailID);
+                                                                            NSMutableArray *myPreviousThumbnail = [self findMyPolaroid:[self.polaroidThumbnailID intValue]];
+                                                                            
+                                                                            
+                                                                            for (Polaroid *each_polaroid in myPreviousThumbnail)
+                                                                            {
+                                                                                NSString *thisThumbnailURL = each_polaroid.imageURL;
+                                                                                
+                                                                                if (thisThumbnailURL != nil)
+                                                                                {
+                                                                                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:thisThumbnailURL]];
+                                                                                    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+                                                                                    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+                                                                                    NSURLSessionDownloadTask *task = [session downloadTaskWithRequest:request
+                                                                                                                                    completionHandler:^(NSURL *localfile, NSURLResponse *response, NSError *error)
+                                                                                                                      {
+                                                                                                                          if (!error)
+                                                                                                                          {
+                                                                                                                              if ([[request.URL absoluteString] isEqual:thisThumbnailURL])
+                                                                                                                              {
+                                                                                                                                  NSData *thisThumbnailImageData = [NSData dataWithContentsOfURL:localfile];
+                                                                                                                                  UIImage *thisThumbnailImage = [UIImage imageWithData:thisThumbnailImageData];
+                                                                                                                                  [self.thumbnailImageButton setBackgroundImage:thisThumbnailImage forState:UIControlStateNormal];
+                                                                                                                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                                                                                                                  });
+                                                                                                                              }
+                                                                                                                          }
+                                                                                                                      }];
+                                                                                    
+                                                                                    [task resume];
+                                                                                }
+                                                                                
+                                                                                self.polaroidThumbnailTitle = each_polaroid.title;
+                                                                                self.polaroidThumbnailDescription = each_polaroid.polaroidDescription;
+                                                                                self.polaroidThumbnailSourceURL = each_polaroid.sourceURL;
+                                                                            }
+                                                                            
+                                                                            
+                                                                            //[self.view setNeedsDisplay];
+                                                                            
+                                                                            //Pretend that a new friend score is being calculated
+                                                                            [self calculateAndSetInterestMeScore]; //currently hidden
+                                                                            self.friendScoreLabel.text = [NSString stringWithFormat:@"%d", self.friendScore];
+                                                                        }
 
                                                                         [[NSNotificationCenter defaultCenter] removeObserver:observer];
                                                                     }];
     }
     
     [self collectPolaroidGenres];
-    UIButton* pinItButton = [Pinterest pinItButton];
-    [pinItButton addTarget:self
-                    action:@selector(pinIt:)
-          forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:pinItButton];
+    
 }
 
 - (void)collectPolaroidGenres
 {
+    //Get an array of all of the Polaroid genres from the server
     if(!_polaroidGenres)
     {
         _polaroidGenres = [[NSMutableArray alloc] init];
@@ -176,172 +249,269 @@ static int xSensitivity = 40;
 
 - (void)fetchPolaroidGenres:(void (^)(BOOL success))completionHandler
 {
-    NSString *urlQuery = [NSString stringWithFormat:@"http://thawing-ocean-9569.herokuapp.com/polaroid/genres.json"];
+    self.filterBank = [[NSMutableDictionary alloc] init];
     
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"] != nil)
+    {
+        NSLog(@"Users filter preferences were previously stored");
+        self.userFilterPreferences = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"];
+        self.filterBank = [self.userFilterPreferences[@"filterBank"] mutableCopy];
+        
+        //NSLog(@"Previously stored Filter Bank was: %@", self.filterBank);
+        
+    }
+    NSString *urlQuery = [NSString stringWithFormat:@"http://thawing-ocean-9569.herokuapp.com/polaroid/genres.json"];
     NSURL *url = [[NSURL alloc] initWithString:urlQuery];
     
     dispatch_queue_t fetchQueue = dispatch_queue_create("Polaroid Genre Fetch", NULL);
     dispatch_async(fetchQueue, ^{
         NSData *jsonResults = [NSData dataWithContentsOfURL:url];
         self.polaroidGenres = [NSJSONSerialization JSONObjectWithData:jsonResults
-                                                                         options:0
-                                                                           error:NULL];
-        
-        NSLog(@"Genre Array: %@", self.polaroidGenres);
-        self.filterBank = [[NSMutableDictionary alloc]init];
-        
+                                                              options:0
+                                                                error:NULL];
+
+        //NSLog(@"%@", self.polaroidGenres);
         for (NSString *each_genre in self.polaroidGenres)
         {
-            [self.filterBank setValue:@1 forKey:each_genre];
+            NSString *capitalized_genre = [each_genre capitalizedString];
+            if (self.filterBank[capitalized_genre] == nil)
+            {
+                [self.filterBank setValue:@1 forKey:capitalized_genre];
+            }
+            //NSLog(@"The users current filter bank is: %@", self.filterBank);
         }
+        NSLog(@"The users current filter bank is: %@", self.filterBank);
         
-        NSLog(@"Filter Bank: %@", self.filterBank);
+        NSUserDefaults *filterDefaults = [NSUserDefaults standardUserDefaults];
+        self.userFilterPreferences = @{@"filterBank": self.filterBank};
+        [filterDefaults setObject:self.userFilterPreferences forKey:@"User Filter Preferences"];
+        [filterDefaults synchronize];
         
         if(completionHandler) dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(YES);
+            
         });
     });
 }
 
-
--(void) updatePolaroidBank
-{
-    if(self.managedObjectContext)
-    {
-        _photoBank = nil;
-        [self stagePolaroids];
-    }
-}
-
 -(NSPredicate *)getPredicate
-{
+{   //Searches for all of the Polaroids matching the filter bank objects that have NOT been viewed already
     NSMutableArray *array_predicates = [[NSMutableArray alloc]init];
+    //NSLog(@"Filter Bank before check for previous: %@", self.filterBank);
+
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"] != nil)
+    {
+        NSMutableDictionary *filterInformation = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"] mutableCopy];
+        self.filterBank = [filterInformation[@"filterBank"] mutableCopy];
+        
+    }
     
     for(NSString *each_filter_key in self.filterBank)
     {
         NSNumber *filter_value = self.filterBank[each_filter_key];
         if([filter_value intValue] == 1)
         {
-            [array_predicates addObject:[NSPredicate predicateWithFormat:@"genre =[c] %@", each_filter_key]];
+            [array_predicates addObject:[NSPredicate predicateWithFormat:@"genre =[c] %@ AND viewed = %@", each_filter_key, [NSNumber numberWithBool: NO]]];
         }
     }
-    
+    //NSLog(@"Array of Predicates: %@", array_predicates);
     return [NSCompoundPredicate orPredicateWithSubpredicates:array_predicates];
+    
 }
 
--(NSMutableArray *)photoBank
+- (NSMutableArray *)photoBank
 {
+    [self photoBank:nil];
+    return _photoBank;
+}
+
+- (NSMutableArray *)photoBank:(NSPredicate *)predicate
+{   //Retrives all the Polaroids matching the search criteria and creates an array from them
     if(!_photoBank)
     {
         NSError *error;
         NSFetchRequest *request  = [NSFetchRequest fetchRequestWithEntityName:@"Polaroid"];
         request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"polaroid_ID" ascending:YES]];
-        request.predicate = [self getPredicate];
+        
+        if (predicate)
+        {
+            request.predicate = predicate;
+        }
+        else
+        {
+            request.predicate = [self getPredicate];
+        }
         
         _photoBank = [[self.managedObjectContext executeFetchRequest:request error:&error] mutableCopy];
         
+        _imageIndex = 0;
         _thumbnailIndex = 0;
+        self.remainingPolaroids = (int32_t)[_photoBank count];
+        
+        //Test script
+        //NSMutableArray *photoBankObjectIDs = [[NSMutableArray alloc]   init];
+        NSLog(@"Total number of polaroids in photo bank is: %d", (int32_t)[_photoBank count]);
+        NSLog(@"Photo Bank contents: %@", _photoBank);
+        //NSLog(@"The contents of the photo bank are: %@", photoBankObjectIDs);
     }
     
+    for (NSDictionary *each_polaroid in _photoBank)
+    {
+        NSNumber *tempPolaroidID = [each_polaroid valueForKey:@"polaroid_ID"];
+        NSString *tempPolaroidURL = [each_polaroid valueForKey:@"imageURL"];
+        NSLog(@"ID: %@, URL: %@",tempPolaroidID, tempPolaroidURL);
+    }
+    
+    NSLog(@"imageIndex: %d", self.imageIndex);
+    
     return _photoBank;
+}
+
+-(void) updatePolaroidBank
+{
+    if(self.managedObjectContext)
+    {
+        _photoBank = nil;
+        self.imageIndex = 0;
+        [self stagePolaroids];
+        
+    }
+    self.remainingPolaroids = (int32_t)[_photoBank count];
+}
+
+- (void)trackRemainingPolaroids
+{
+    
+    NSLog(@"imageIndex: %d", self.imageIndex);
+
+    //NSLog(@"Are there are enough Polaroids to continue?");
+    
+    if (self.remainingPolaroids <= 3)
+    {
+        NSLog(@"There are only %d polaroids remaining, Fetch more from the server!", self.remainingPolaroids);
+        
+        //FETCH MORE POLAROIDS FROM THE SERVER
+        PolaroidDatabase *ivc = [PolaroidDatabase sharedDefaultPolaroidDatabase];
+        [ivc fetchWithCompletionHandler:^(BOOL success){
+            [self updatePolaroidBank];
+        }];
+    }
+    else
+    {
+        NSLog(@"There are %d polaroids remaining", self.remainingPolaroids);
+    }
+}
+
+- (void)saveData
+{
+    NSLog(@"User Progress being saved.");
+    NSUserDefaults *usersCurrentProgress = [NSUserDefaults standardUserDefaults];
+    
+    NSNumber *lastInterestMeScore = [NSNumber numberWithInt:self.interestMeScore];
+    NSNumber *polaroidIDForLastViewedPolaroid = [NSNumber numberWithInt:self.frontPolaroidCardView.polaroid.polaroid_ID];
+    NSNumber *polaroidIDForLastThumbnail = self.polaroidThumbnailID;
+    NSNumber *lastFriendScore = [NSNumber numberWithInt:self.friendScore];
+    
+    NSLog(@"Friend Score being saved: %@", lastFriendScore);
+    
+    
+    NSDictionary *savedUserInfo = @{@"lastViewedPolaroid":polaroidIDForLastViewedPolaroid,
+                                    @"thumbnailPolaroidID":polaroidIDForLastThumbnail,
+                                    @"lastViewedFriendScore":lastFriendScore,
+                                    @"lastViewedInterestMeScore":lastInterestMeScore};
+    
+    [usersCurrentProgress setObject:savedUserInfo forKey:@"savedPreviousSession"];
+    [usersCurrentProgress synchronize];
+    
+}
+
+- (NSMutableArray *)findMyPolaroid:(int)polaroidID
+{
+    NSError *error;
+    NSFetchRequest *request  = [NSFetchRequest fetchRequestWithEntityName:@"Polaroid"];
+    request.predicate = [NSPredicate predicateWithFormat:@"polaroid_ID = %d", polaroidID];
+    NSLog(@"Predicate for retrieving Thumbnail: %@", request.predicate);
+    NSMutableArray *myPolaroid = [[self.managedObjectContext executeFetchRequest:request error:&error] mutableCopy];
+    
+    NSLog(@"error: %@", error);
+    NSLog(@"Polaroid returned by findMyPolaroid: %@",myPolaroid);
+    return myPolaroid;
+}
+
+- (void)followGenre:(NSString *)genre
+{
+    
 }
 
 ///////////////////////////////////////////////////////////////BEGINING OF POLAROID BEHAVIOR
 - (void)stagePolaroids
 {
-    if(self.imageIndex >= [self.photoBank count])
-        self.imageIndex = [self.photoBank count] - 1.0;
+    self.frontPolaroidCardView.polaroid = self.photoBank[self.imageIndex + 0];
+    [self.frontPolaroidCardView startDownloadingImage];
     
-    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedUserInfo"] != nil)
+    self.middlePolaroidCardView.polaroid = self.photoBank[self.imageIndex + 1];
+    [self.middlePolaroidCardView startDownloadingImage];
+    
+    self.backPolaroidCardView.polaroid = self.photoBank[self.imageIndex + 2];
+    [self.backPolaroidCardView startDownloadingImage];
+    
+    self.imageIndex = self.imageIndex + 2;
+    self.tempPolaroidCardView = nil;
+    
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] == nil)
     {
-        NSLog(@"POLAROIDS PREVIOUSLY STAGED!!!");
-
-        //LEGACY CODE
-        self.frontPolaroidCardView.polaroid = self.photoBank[self.imageIndex + 0];
-        [self.frontPolaroidCardView startDownloadingImage];
-        
-        self.middlePolaroidCardView.polaroid = self.photoBank[self.imageIndex + 1];
-        [self.middlePolaroidCardView startDownloadingImage];
-        
-        self.backPolaroidCardView.polaroid = self.photoBank[self.imageIndex + 2];
-        [self.backPolaroidCardView startDownloadingImage];
-        
-        self.imageIndex = self.imageIndex + 2;
-        self.tempPolaroidCardView = nil;
-        
-        self.interestMeScore = [self.indexInformation[@"lastViewedInterestMeScore"] intValue];
-
-        Polaroid *thumbnail = self.photoBank[self.imageIndex - 1];
-        self.polaroidThumbnailImage = [UIImage imageWithData:thumbnail.image];
-        self.polaroidThumbnailImageURL = thumbnail.imageURL;
-        [self updateThumbnailInfo];
-        
-        [self setFriendScore:1];
-        
-        
-        self.panGR = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragPolaroid:)];
-        self.tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPolaroidView:)];
-        [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
-        [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
-        [self.frontPolaroidCardView shadePolaroidBackground];
-        self.currentPolaroidImageURL = self.frontPolaroidCardView.polaroid.imageURL;
-        
-        NSLog(@"Previously stored interestMe Score: %d", self.interestMeScore);
+        self.interestMeScore = [self.previousSessionInformation[@"lastViewedInterestMeScore"] intValue];
     }
-    else
-    {
-        NSLog(@"FIRST TIME THAT POLAROIDS ARE BEING STAGED!!!");
-        self.frontPolaroidCardView.polaroid = self.photoBank[self.imageIndex + 0];
-        [self.frontPolaroidCardView startDownloadingImage];
-        
-        self.middlePolaroidCardView.polaroid = self.photoBank[self.imageIndex + 1];
-        [self.middlePolaroidCardView startDownloadingImage];
-        
-        self.backPolaroidCardView.polaroid = self.photoBank[self.imageIndex + 2];
-        [self.backPolaroidCardView startDownloadingImage];
 
-        self.imageIndex = self.imageIndex + 2;
-        self.tempPolaroidCardView = nil;
-        
-        self.panGR = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragPolaroid:)];
-        self.tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPolaroidView:)];
-        [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
-        [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
-        [self.frontPolaroidCardView shadePolaroidBackground];
-        self.currentPolaroidImageURL = self.frontPolaroidCardView.polaroid.imageURL;
-    }
+    [self updateThumbnailInfo];
+    [self setFriendScore:1];
+    
+    self.panGR = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragPolaroid:)];
+    self.tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapPolaroidView:)];
+    [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
+    [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
+    [self.frontPolaroidCardView shadePolaroidBackground];
+    self.currentPolaroidImageURL = self.frontPolaroidCardView.polaroid.imageURL;
+
 }
 
 - (void)updateThumbnailInfo
 {
     //setup the thumbnail button after a polaroid is swiped
-    NSLog(@"Image Index when iterating: %d", self.imageIndex);
+    [self.friendScoreLabel setHidden:NO];
+    [self.friendScoreDescription setHidden:NO];
+
     if (resizeThumbnails)
     {
         float thumbnailHeight = self.thumbnailImageButton.bounds.size.height;
         float thumbnailWidth = self.thumbnailImageButton.bounds.size.width;
         CGSize thumbnailSize = CGSizeMake(thumbnailWidth, thumbnailHeight);
-        UIImage *resizedThumbnailImage = [UIImage imageToFitSize:self.frontPolaroidCardView.polaroidImage size:thumbnailSize method:MGImageResizeCrop];
+        UIImage *resizedThumbnailImage = [UIImage imageToFitSize:self.polaroidThumbnailImage size:thumbnailSize method:MGImageResizeCrop];
         [self.thumbnailImageButton setBackgroundImage:resizedThumbnailImage forState:UIControlStateNormal];
     }
     else
     {
-        [self.thumbnailImageButton setBackgroundImage:self.frontPolaroidCardView.polaroidImage forState:UIControlStateNormal];
+        [self.thumbnailImageButton setBackgroundImage:self.polaroidThumbnailImage forState:UIControlStateNormal];
     }
     [self.thumbnailImageButton setNeedsDisplay];
 }
 
 - (void)interateTheNextPolaroid
 {
+    //[self updatePolaroidBank];
     [self calculateAndSetInterestMeScore];
     [self setFriendScore:1];
     
     self.polaroidThumbnailImage = self.frontPolaroidCardView.polaroidImage;
     self.polaroidThumbnailImageURL = self.frontPolaroidCardView.polaroid.imageURL;
+    self.polaroidThumbnailID = [NSNumber numberWithInt:self.frontPolaroidCardView.polaroid.polaroid_ID];
+    self.polaroidThumbnailImageData = self.frontPolaroidCardView.polaroid.image;
     self.polaroidThumbnailTitle = self.frontPolaroidCardView.polaroid.title;
     self.polaroidThumbnailDescription = self.frontPolaroidCardView.polaroid.polaroidDescription;
     self.polaroidThumbnailSourceURL = self.frontPolaroidCardView.polaroid.sourceURL;
     [self updateThumbnailInfo];
+    
+    [self saveData];
 /*
  Redraw the old frontPolaroid behind the nextPolaroid
  Set the middlePolaroid equal to the frontPolaroid
@@ -350,11 +520,14 @@ static int xSensitivity = 40;
  Reset the position of the frontPolaroid View
  
  */
+    
+    NSLog(@"%@ %@ %@", self.frontPolaroidCardView.polaroid.title, self.middlePolaroidCardView.polaroid.title, self.backPolaroidCardView.polaroid.title);
+    
     self.currentPolaroidImageURL = self.middlePolaroidCardView.polaroid.imageURL;
     self.currentPolaroidTitle = self.middlePolaroidCardView.polaroid.title;
     self.currentPolaroidDescription = self.middlePolaroidCardView.polaroid.polaroidDescription;
-    NSLog(@"Middle Description:%@", self.middlePolaroidCardView.polaroid.polaroidDescription);
-    NSLog(@"Current Description:%@", self.currentPolaroidDescription);
+    //NSLog(@"Middle Description:%@", self.middlePolaroidCardView.polaroid.polaroidDescription);
+    //NSLog(@"Current Description:%@", self.currentPolaroidDescription);
     self.currentPolaroidSourceURL = self.middlePolaroidCardView.polaroid.sourceURL;
     
     self.imageIndex++;
@@ -376,13 +549,18 @@ static int xSensitivity = 40;
         [self.frontPolaroidCardView shadePolaroidBackground];
         [self.frontPolaroidCardView addGestureRecognizer:self.panGR];
         [self.frontPolaroidCardView addGestureRecognizer:self.tapGR];
+        //NSLog(@"Genre of Current Polaroid: %@", self.frontPolaroidCardView.polaroid.genre);
     }
     else if (self.imageIndex == [self.photoBank count])
     {
-        //RESET THE IMAGE INDEX IF THE USER HAS REACHED THE END OF THE POLAROID ARRAY
+//        //RESET THE IMAGE INDEX IF THE USER HAS REACHED THE END OF THE POLAROID ARRAY
         self.imageIndex = 0;
-        self.thumbnailIndex = 0;
-        
+//        self.thumbnailIndex = 0;
+//
+        //PolaroidDatabase *ivc = [PolaroidDatabase sharedDefaultPolaroidDatabase];
+        //[ivc fetch];
+        NSLog(@"Fetch More Polaroids!");
+    
         self.tempPolaroidCardView = self.frontPolaroidCardView;
         self.frontPolaroidCardView = self.middlePolaroidCardView;
         self.middlePolaroidCardView = self.backPolaroidCardView;
@@ -431,11 +609,10 @@ static int xSensitivity = 40;
             CGAffineTransform translation = CGAffineTransformMakeTranslation(self.xDistance, self.yDistance);
             CGAffineTransform differentTransform = CGAffineTransformScale(translation, scale, scale);
             CGAffineTransform thirdTransfrom = CGAffineTransformRotate(differentTransform, rotationAngle);
-
-            self.frontPolaroidCardView.transform = thirdTransfrom;
             
-            //[self updateOverlay:self.xDistance];
-                
+            [self.frontPolaroidCardView updateOverlay:_xDistance yDistance:_yDistance];
+            self.frontPolaroidCardView.transform = thirdTransfrom;
+
             break;
         };
         case UIGestureRecognizerStateEnded:
@@ -443,8 +620,42 @@ static int xSensitivity = 40;
 //            //If the image is moved more than 75 pixels in the x-direction, the image is removed from the view and
 //            //a method WILL BE triggered to add the image to an array of boringImages or interestMeImages
                 
+            //Swipe Right - Image is interesting
+            if (self.xDistance > 75 && self.yDistance < ySensitivity)
+            {
+                [UIView animateWithDuration:0.2 delay:0.00 options:UIViewAnimationOptionCurveEaseOut
+                                 animations:^{
+                                     CGAffineTransform scale = CGAffineTransformMakeScale(.75, .75);
+                                     CGAffineTransform translate = CGAffineTransformMakeTranslation(700.0, 0.0);
+                                     
+                                     self.frontPolaroidCardView.center = CGPointMake(self.originalPoint.x + self.xDistance, self.originalPoint.y + self.yDistance);
+                                     self.frontPolaroidCardView.transform = CGAffineTransformConcat(scale, translate);
+
+                                 }
+                                 completion:^(BOOL finished) {
+                                     self.frontPolaroidCardView.polaroid.interestingToMe = YES;
+                                     self.frontPolaroidCardView.polaroid.savedByMe = YES;
+                                     
+                                     self.frontPolaroidCardView.polaroid.numberOfTimesSaved++;
+                                     self.frontPolaroidCardView.polaroid.numberOfPeopleInterestedInThis++;
+                                     self.frontPolaroidCardView.polaroid.viewed = YES;
+                                      [self.frontPolaroidCardView hideOverlay];
+                                     
+                                     [self handlePostToServer:self.userIdentification polaroidID:self.frontPolaroidCardView.polaroid.polaroid_ID sent:0 saved:0 boring:0 interesting:1];
+                                     
+                                     //[self photoBank:[NSPredicate predicateWithFormat:self.frontPolaroidCardView.polaroid.genre]];
+                                     [self interateTheNextPolaroid];
+                                     self.remainingPolaroids--;
+                                     [self trackRemainingPolaroids];
+                                     
+                                 }
+                 ];
+                
+                break;
+            }
+            
             //Swipe Left - Image is boring
-            if (self.xDistance < - 75 && self.yDistance < ySensitivity)
+            else if (self.xDistance < - 75 && self.yDistance < ySensitivity)
             {
                 [UIView animateWithDuration:0.2 delay:0.00 options:UIViewAnimationOptionCurveEaseOut
                                  animations:^{
@@ -458,44 +669,30 @@ static int xSensitivity = 40;
                                  completion:^(BOOL finished) {
                                      //self.boringToMe = YES;
                                      self.frontPolaroidCardView.polaroid.boringToMe = YES;
+                                     self.frontPolaroidCardView.polaroid.image = nil;
                                      self.frontPolaroidCardView.polaroid.numberOfPeopleBoredByThis++;
+                                     self.frontPolaroidCardView.polaroid.viewed = YES;
+                                     [self.frontPolaroidCardView hideOverlay];
                                      
                                     [self handlePostToServer:self.userIdentification polaroidID:self.frontPolaroidCardView.polaroid.polaroid_ID sent:0 saved:0 boring:1 interesting:0];
+                                     
+                                     //[self photoBank];
                                      [self interateTheNextPolaroid];
+                                     self.remainingPolaroids--;
+                                     [self trackRemainingPolaroids];
+
                                  }
                  ];
                 
                 break;
             }
-            //Swipe Right - Image is interesting
-            else if (self.xDistance > 75 && self.yDistance < ySensitivity)
-            {
-                [UIView animateWithDuration:0.2 delay:0.00 options:UIViewAnimationOptionCurveEaseOut
-                                 animations:^{
-                                     CGAffineTransform scale = CGAffineTransformMakeScale(.75, .75);
-                                     CGAffineTransform translate = CGAffineTransformMakeTranslation(700.0, 0.0);
-                                     
-                                     self.frontPolaroidCardView.center = CGPointMake(self.originalPoint.x + self.xDistance, self.originalPoint.y + self.yDistance);
-                                     self.frontPolaroidCardView.transform = CGAffineTransformConcat(scale, translate);
-                                     
-                                 }
-                                 completion:^(BOOL finished) {
-                                    self.frontPolaroidCardView.polaroid.interestingToMe = YES;
-                                    self.frontPolaroidCardView.polaroid.savedByMe = YES;
-                                     
-                                    [self handlePostToServer:self.userIdentification polaroidID:self.frontPolaroidCardView.polaroid.polaroid_ID sent:0 saved:0 boring:0 interesting:1];
-                                    self.frontPolaroidCardView.polaroid.numberOfTimesSaved++;
-                                    self.frontPolaroidCardView.polaroid.numberOfPeopleInterestedInThis++;
-                                    [self interateTheNextPolaroid];
-                                 }
-                 ];
-                
-                break;
-            }
+
             //Swipe Up - Send Image
-            if (self.yDistance < - 20 && self.xDistance < xSensitivity)
+            if (self.yDistance < - 15 && self.xDistance < xSensitivity)
             {
                 [self resetViewPositionAndTransformations];
+                self.frontPolaroidCardView.polaroid.viewed = YES;
+                [self.frontPolaroidCardView hideOverlay];
                 [self sharePolaroid];
 
                 break;
@@ -533,7 +730,6 @@ static int xSensitivity = 40;
         case UIGestureRecognizerStateCancelled:break;
         case UIGestureRecognizerStateFailed:break;
     }
-    
 }
 
 - (void)resetViewPositionAndTransformations
@@ -542,19 +738,19 @@ static int xSensitivity = 40;
                      animations:^{
                          self.frontPolaroidCardView.center = self.originalPoint;
                          self.frontPolaroidCardView.transform = CGAffineTransformMakeRotation(0);
+                         [self.frontPolaroidCardView hideOverlay];
                      }
                      completion:^(BOOL finished) {
                          [self.middlePolaroidCardView unshadePolaroidBackground];
-                         //self.overlayView.alpha = 0;
                      }
      ];
 }
+
 ////////////////////////////END OF POLAROID BEHAVIOR
 
 /////////////////////////////////////////////////////////////////////////////UPDATE SCORING INFORMATION
 - (void)calculateAndSetInterestMeScore
 {
-    
     //NSLog(@"Numbers %d", self.frontPolaroidCardView.polaroid.numberOfPeopleInterestedInThis);
     
     int swipeValueDivisor = (self.frontPolaroidCardView.polaroid.numberOfPeopleInterestedInThis/self.frontPolaroidCardView.polaroid.numberOfPeopleBoredByThis);
@@ -566,18 +762,17 @@ static int xSensitivity = 40;
     if (self.frontPolaroidCardView.polaroid.interestingToMe)
     {
         self.interestMeScore = self.interestMeScore + swipeValue;
-        NSLog(@"Score went up: %f", swipeValue);
+        //NSLog(@"Score went up: %f", swipeValue);
     }
     else
     {
         self.interestMeScore = self.interestMeScore - swipeValue;
-        NSLog(@"Score went down: %f", swipeValue);
+        //NSLog(@"Score went down: %f", swipeValue);
     }
     self.interestMeScoreLabel.text = [NSString stringWithFormat:@"%d", self.interestMeScore];
 }
 
-
-- (void)setInterestMeScore:(int)interestMeScore
+- (void)setInterestMeScore:(int)interestMeScore //HIDDEN FOR THIS VERSION OF INTERESTME
 {
     _interestMeScore = interestMeScore;
     self.interestMeScoreLabel.text = [NSString stringWithFormat:@"%d", self.interestMeScore];
@@ -595,8 +790,7 @@ static int xSensitivity = 40;
 - (IBAction)tapOnGlobalView:(UITapGestureRecognizer *)sender
 {
     self.navigationController.navigationBar.hidden = NO;
-    //self.navigationController.navigationBar.hidden = !self.navigationController.navigationBarHidden;
-    //NSLog(@"Someone tapped on my screen!");
+
 }
 
 - (void) tapPolaroidView:(id)sender
@@ -604,7 +798,7 @@ static int xSensitivity = 40;
     FullScreenViewController *ivc = [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"FullScreenViewID"];
     [[self navigationController] setNavigationBarHidden:YES animated:NO];
     ivc.imageURL =  [NSURL URLWithString:self.currentPolaroidImageURL];
-    NSLog(@"Current Polaroid Title:%@", self.currentPolaroidDescription);
+    //NSLog(@"Current Polaroid Title:%@", self.currentPolaroidDescription);
     ivc.fullScreenTitle = self.currentPolaroidTitle;
     ivc.fullScreenDescription = self.currentPolaroidDescription;
     ivc.fullScreenSourceURL = self.currentPolaroidSourceURL;
@@ -619,7 +813,7 @@ static int xSensitivity = 40;
         if ([segue.destinationViewController isKindOfClass:[FullScreenViewController class]]) {
             [[self navigationController] setNavigationBarHidden:YES animated:NO];
             FullScreenViewController *ivc = (FullScreenViewController *)segue.destinationViewController;
-            NSLog(@"Thumbnail Hit %d", self.thumbnailIndex);
+            //NSLog(@"Thumbnail Hit %d", self.thumbnailIndex);
             ivc.imageURL = [NSURL URLWithString:self.polaroidThumbnailImageURL];
             ivc.fullScreenTitle = self.polaroidThumbnailTitle;
             ivc.fullScreenDescription = self.polaroidThumbnailDescription;
@@ -743,6 +937,9 @@ static int xSensitivity = 40;
     self.frontPolaroidCardView.polaroid.sentByMe = YES;
     self.frontPolaroidCardView.polaroid.numberOfTimesSent++;
                          [self interateTheNextPolaroid];
+                         self.remainingPolaroids--;
+                         [self trackRemainingPolaroids];
+
                      }
         ];
 }

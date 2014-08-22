@@ -153,31 +153,25 @@
 
 - (void)handleSingleTap
 {
-    NSLog(@"You SINGLE tapped on the screen");
+    //NSLog(@"You SINGLE tapped on the screen");
     [self.navigationController popViewControllerAnimated:YES];
     [[self navigationController] setNavigationBarHidden:NO animated:NO];
 }
 
 - (void)handleDoubleTap
 {
-    NSLog(@"You DOUBLE tapped on the screen");
+    //NSLog(@"You DOUBLE tapped on the screen");
     
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
     myWebView *controller = (myWebView*)[mainStoryboard instantiateViewControllerWithIdentifier: @"WebViewID"];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:controller];
     navigationController.navigationBar.barStyle = UIBarStyleDefault;
 
-    
-    
     controller.webViewURL = [NSURL URLWithString:self.fullScreenSourceURL];
-    
-    NSLog(@"hihi");
-    //[self.navigationController pushViewController:controller animated:YES];
     
     // present
     [self presentViewController:navigationController animated:YES completion:nil];
     
-
 }
 
 @end

@@ -11,9 +11,12 @@
 #import "Polaroid.h"
 #import "SettingsCDTVC.h"
 
+@class APPViewController;
+
 @interface CDWAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property (weak, nonatomic) DraggableViewController *draggableViewController;
+@property (strong, nonatomic) APPViewController *viewController;
 
 @end

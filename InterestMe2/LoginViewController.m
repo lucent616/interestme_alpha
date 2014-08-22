@@ -38,8 +38,8 @@
         self.userInformationFromServer = [NSJSONSerialization JSONObjectWithData:jsonResults
                                                                        options:0
                                                                          error:NULL];
-        
-        [self saveData];
+        //NSLog(@"%@",self.userInformationFromServer);
+        [self saveUserData];
         
             if(completionHandler) dispatch_async(dispatch_get_main_queue(), ^{
                 completionHandler(YES);
@@ -47,13 +47,15 @@
     });
 }
 
-- (void)saveData
+- (void)saveUserData
 {
     NSUserDefaults *loginDefault = [NSUserDefaults standardUserDefaults];
     
-    NSDictionary *userId = @{@"id": self.userInformationFromServer[@"id"]};
+    NSDictionary *userID = @{@"userID": self.userInformationFromServer[@"id"]};//Named "id" in the feed from the server
     
-    [loginDefault setObject:userId forKey:@"userInfo"];
+    NSLog(@"This users has now been given userID number: %@", userID[@"userID"]);
+    
+    [loginDefault setObject:userID forKey:@"User Information From Server"];
     [loginDefault synchronize];
 }
 @end

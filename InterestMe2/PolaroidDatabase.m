@@ -10,6 +10,7 @@
 #import "FlickrFetcher.h"
 #import "Polaroid+AddOn.h"
 #import "Polaroid.h"
+#import "DraggableViewController.h"
 
 @interface PolaroidDatabase()
 @property (nonatomic, readwrite, strong) NSManagedObjectContext *managedObjectContext;
@@ -144,7 +145,16 @@
 ////////////////////////////////////////////////////GET DATA FROM SERVER
 - (void)fetchPhotos:(void (^)(BOOL success))completionHandler
 {
-    NSURL *url = [[NSURL alloc] initWithString:@"http://thawing-ocean-9569.herokuapp.com/polaroids.json"];
+    NSNumber *lastFetchedPolaroidId = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastFetchedPolaroidId"];
+    
+    if(!lastFetchedPolaroidId)
+        lastFetchedPolaroidId = [NSNumber numberWithInt:0];
+    
+    int fetchLimit = 5;
+
+    NSString *fetchURL = [NSString stringWithFormat:@"http://thawing-ocean-9569.herokuapp.com/polaroids/%@/%d",lastFetchedPolaroidId,fetchLimit];
+    NSLog(@"%@", fetchURL);
+    NSURL *url = [[NSURL alloc] initWithString:fetchURL];
     
     dispatch_queue_t fetchQueue = dispatch_queue_create("Polaroid Polaroid Fetch", NULL);
     dispatch_async(fetchQueue, ^{
@@ -154,12 +164,22 @@
                                                                               error:NULL];
         [self.managedObjectContext performBlock:^{
 
-            //NSLog(@"Photos Array: %@", self.polaroidArrayFromServer);
-        
+            NSNumber *tempID = [NSNumber numberWithInt:0];
+            
+            //NSLog(@"Polaroids fetched from the server: %@", self.polaroidArrayFromServer);
+            
             for (NSDictionary *photoDictionary in _polaroidArrayFromServer)
             {
-                [Polaroid polaroidWithInfo:photoDictionary inManagedObjectContext:self.managedObjectContext];
+                Polaroid *polaroid = [Polaroid polaroidWithInfo:photoDictionary inManagedObjectContext:self.managedObjectContext];
+                
+                if([tempID intValue] < polaroid.polaroid_ID)
+                    tempID = [NSNumber numberWithInt:polaroid.polaroid_ID];
             }
+            
+            NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+            [userDefault setObject:tempID forKey:@"lastFetchedPolaroidId"];
+            [userDefault synchronize];
+
             
             if(completionHandler) dispatch_async(dispatch_get_main_queue(), ^{
                 completionHandler(YES);

@@ -10,6 +10,6 @@
 
 @interface myWebView : UIViewController <UIWebViewDelegate>
 @property (weak, nonatomic) IBOutlet UIWebView *webViewForPolaroidSource;
-@property (strong, nonatomic) NSString *webViewURL;
+@property (strong, nonatomic) NSURL *webViewURL;
 
 @end

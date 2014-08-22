@@ -1,8 +1,8 @@
 //
 //  Polaroid.m
-//  InterestMe2
+//  InterestMe
 //
-//  Created by Collin Wallace on 7/10/14.
+//  Created by Collin Wallace on 7/25/14.
 //  Copyright (c) 2014 Collin Wallace. All rights reserved.
 //
 
@@ -12,7 +12,9 @@
 
 @implementation Polaroid
 
+@dynamic author;
 @dynamic boringToMe;
+@dynamic dateTaken;
 @dynamic genre;
 @dynamic image;
 @dynamic imageURL;
@@ -25,10 +27,9 @@
 @dynamic polaroidDescription;
 @dynamic savedByMe;
 @dynamic sentByMe;
-@dynamic title;
 @dynamic sourceURL;
-@dynamic author;
-@dynamic dateTaken;
+@dynamic title;
+@dynamic viewed;
 @dynamic allUsersBoredByThisPolaroid;
 @dynamic allUsersInterestedByThisPolaroid;
 @dynamic allUsersThatSavedThisPolaroid;

@@ -7,12 +7,19 @@
 //
 
 #import "CDWAppDelegate.h"
+#import "PolaroidDatabase.h"
+#import "APPViewController.h"
 
 @implementation CDWAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    UIPageControl *pageControl = [UIPageControl appearance];
+    pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
+    pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
+    pageControl.backgroundColor = [UIColor whiteColor];
+    
     return YES;
 }
 							
@@ -26,6 +33,8 @@
 {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    NSLog(@"Application entering the background");
+    [self saveContext];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -40,28 +49,30 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    NSLog(@"Application Terminating");
+    [self saveContext];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-    NSUserDefaults *indexDefault = [NSUserDefaults standardUserDefaults];
+
+}
+
+- (void)saveContext
+{
+    NSError *error = nil;
+    PolaroidDatabase *db = [PolaroidDatabase sharedDefaultPolaroidDatabase];
     
-    //PolaroidCardView *frontViewedPolaroidCardView = self.draggableViewController.frontPolaroidCardView;
-    //PolaroidCardView *middleViewedPolaroidCardView = self.draggableViewController.middlePolaroidCardView;
-    //PolaroidCardView *backViewedPolaroidCardView = self.draggableViewController.backPolaroidCardView;
-    NSNumber *lastInterestMeScore = [NSNumber numberWithInt:self.draggableViewController.interestMeScore];
-    NSNumber *imageIndexObject = [NSNumber numberWithInt:(self.draggableViewController.imageIndex - 2.0)];
-    NSMutableDictionary *recentFilterBank = self.draggableViewController.filterBank;
+    if (db.managedObjectContext != nil)
+    {
+        if ([db.managedObjectContext hasChanges] && ![db.managedObjectContext save:&error])
+        {
+            /*Replace this implementation with code to handle the error appropriately.
+            abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            */
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            abort();
+        }
+        NSLog(@"Managed Object Context Saved.");
+    }
     
-    NSDictionary *savedUserInfo = @{@"index":imageIndexObject,
-                                    //@"thumbnailButtonImage":self.draggableViewController.polaroidThumbnailImage,
-                                    //@"polaroidThumbnailImageURL":self.draggableViewController.polaroidThumbnailImageURL,
-                                        //@"frontPolaroid":frontViewedPolaroidCardView,
-                                        //@"middlePolaroid":middleViewedPolaroidCardView,
-                                        //@"backPolaroid":backViewedPolaroidCardView,
-                                        @"lastViewedInterestMeScore":lastInterestMeScore,
-                                        @"filterBank":recentFilterBank};
-    
-    [indexDefault setObject:savedUserInfo forKey:@"savedUserInfo"];
-    [indexDefault synchronize];
-    NSLog(@"Image Index %@ was saved when the application was terminated", imageIndexObject);
 }
 
 @end

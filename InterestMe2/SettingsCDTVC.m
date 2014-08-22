@@ -10,13 +10,14 @@
 #import "PolaroidCollectionViewController.h"
 #import "DraggableViewController.h"
 #import "Polaroid+AddOn.h"
-#import "settingViewCell.h"
+#import "SettingsTableViewCell.h"
 
 @interface SettingsCDTVC ()
 @property (strong, nonatomic) NSMutableDictionary *settingsLabels;
 @property (nonatomic) NSUInteger tableIndex;
 @property (strong, nonatomic) NSMutableDictionary *filterBank;
-
+@property (strong, nonatomic) NSDictionary *filterInformation;
+@property (strong, nonatomic) DraggableViewController *prevVC;
 
 @end
 
@@ -35,29 +36,38 @@
 {
     [super viewDidLoad];
     
-    DraggableViewController *prevVC = self.navigationController.viewControllers[0];
-    self.filterBank = prevVC.filterBank;
+    self.prevVC = self.navigationController.viewControllers[0];
+    [self setupMyFilters];
     
-//    for (NSString *each_genre in self.filterBank)
-//    {
-//        self.genreSwitch.on = [[self.filterBank objectForKey:[NSString stringWithFormat:@"%@",each_genre]] intValue] == 1 ? YES : NO;
-//    }
-    
-    /*
-    
-    self.artSwitch.on = [self.filterBank[@"art"] intValue] == 1 ? YES : NO;
-    self.carsSwitch.on = [self.filterBank[@"cars"] intValue] == 1 ? YES : NO;
-    self.designSwitch.on = [self.filterBank[@"design"] intValue] == 1 ? YES : NO;
-    self.homesSwitch.on = [self.filterBank[@"homes"] intValue] == 1 ? YES : NO;
-    
-*/
-
 }
+
 - (void)setupMyFilters
 {
-    DraggableViewController *prevVC = self.navigationController.viewControllers[0];
-    prevVC.filterBank = self.filterBank;
-    [prevVC updatePolaroidBank];
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"] != nil)
+    {
+        NSLog(@"Filter preferences read from draggable view");
+        self.filterInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"];
+        self.filterBank = [self.filterInformation[@"filterBank"] mutableCopy];
+        
+        NSLog(@"Filter bank from draggable view was: %@", self.filterBank);
+    }
+    else
+    {
+        NSLog(@"No current Filter Bank found");
+        self.filterBank = self.prevVC.filterBank;
+        NSLog(@"Original Filter Bank: %@", self.filterBank);
+    }
+}
+
+- (void)saveFilterPreferences
+{
+    NSUserDefaults *filterDefaults = [NSUserDefaults standardUserDefaults];
+    
+    self.filterInformation = @{@"filterBank": self.filterBank};
+    NSLog(@"Filter bank settings when saved on settings page: %@", self.filterBank);
+    
+    [filterDefaults setObject:self.filterInformation forKey:@"User Filter Preferences"];
+    [filterDefaults synchronize];
 }
 
 - (IBAction)switchWasChanged:(UISwitch *)sender
@@ -65,7 +75,7 @@
     CGPoint touchPosition = [sender convertPoint:CGPointZero toView:self.tableView];
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:touchPosition];
     
-    settingViewCell *currentCell = (settingViewCell *) [self.tableView cellForRowAtIndexPath:indexPath];
+    SettingsTableViewCell *currentCell = (SettingsTableViewCell *) [self.tableView cellForRowAtIndexPath:indexPath];
     
     if (currentCell.filterSwitch.isOn)
     {
@@ -75,12 +85,12 @@
     {
         [self.filterBank setObject:@0 forKey:currentCell.genreLabel.text];
     }
-    NSLog(@"The new FilterBank : %@", self.filterBank);
-    [self setupMyFilters];
+    NSLog(@"The user new filter bank is: %@", self.filterBank);
+    
+    [self saveFilterPreferences];
+    //[self.prevVC updatePolaroidBank];
+    [self.prevVC trackRemainingPolaroids];
 }
-
-/////////////////////////////////////WHEN I WANT TO ADD DYNAMIC LABELS
-
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -96,11 +106,11 @@
 {
     static NSString *cellIdentifier = @"GenreTableCell";
     
-    settingViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
+    SettingsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
     if (cell == nil) {
-        cell = [[settingViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[SettingsTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
-    NSString *cellGenre = [[self.filterBank allKeys] objectAtIndex:indexPath.row];
+    NSString *cellGenre = [[[self.filterBank allKeys] sortedArrayUsingSelector: @selector(compare:)] objectAtIndex:indexPath.row];
     cell.genreLabel.text = cellGenre;
     int switchValue = [[self.filterBank objectForKey:cellGenre] intValue];
     if ( switchValue == 1)
@@ -111,10 +121,7 @@
          {
              cell.filterSwitch.on = NO;
          }
-    
     return cell;
 }
-
-/////////END OF DYNAMIC LABELS
 
 @end

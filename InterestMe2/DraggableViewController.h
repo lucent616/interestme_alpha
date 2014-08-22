@@ -31,6 +31,8 @@
 @property (nonatomic) int userID;
 @property (strong, nonatomic) NSMutableArray *polaroidGenres;
 
--(void) updatePolaroidBank;
+- (void) updatePolaroidBank;
+- (void)saveData;
+- (void)trackRemainingPolaroids;
 
 @end

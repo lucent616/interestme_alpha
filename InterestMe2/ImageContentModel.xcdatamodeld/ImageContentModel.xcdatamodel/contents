@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13D65" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13E28" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Polaroid" representedClassName="Polaroid" syncable="YES">
         <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="boringToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
@@ -12,12 +12,13 @@
         <attribute name="numberOfPeopleInterestedInThis" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="numberOfTimesSaved" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="numberOfTimesSent" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
-        <attribute name="polaroid_ID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="polaroid_ID" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="polaroidDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="savedByMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="sentByMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="sourceURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="viewed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <relationship name="allUsersBoredByThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsInterestingToThisUser" inverseEntity="User" syncable="YES"/>
         <relationship name="allUsersInterestedByThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsSentByThisUser" inverseEntity="User" syncable="YES"/>
         <relationship name="allUsersThatSavedThisPolaroid" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="allPolaroidsSavedByThisUser" inverseEntity="User" syncable="YES"/>
@@ -35,7 +36,7 @@
         <relationship name="allPolaroidsSentByThisUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Polaroid" inverseName="allUsersInterestedByThisPolaroid" inverseEntity="Polaroid" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Polaroid" positionX="-9" positionY="-106" width="252" height="358"/>
+        <element name="Polaroid" positionX="-9" positionY="-106" width="252" height="373"/>
         <element name="User" positionX="-432" positionY="-117" width="252" height="178"/>
     </elements>
 </model>

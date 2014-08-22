@@ -27,7 +27,7 @@
         _polaroidsSavedByMe = [[NSMutableArray alloc] init];
         NSError *error;
         NSFetchRequest *request  = [NSFetchRequest fetchRequestWithEntityName:@"Polaroid"];
-        request.predicate = [NSPredicate predicateWithFormat:@"savedByMe == YES"];
+        request.predicate = [NSPredicate predicateWithFormat:@"savedByMe == YES AND image != nil"];
 
         _polaroidsSavedByMe = [[self.managedObjectContext executeFetchRequest:request error:&error] mutableCopy];
     }

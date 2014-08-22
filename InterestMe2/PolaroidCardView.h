@@ -16,11 +16,15 @@
 @property (strong, nonatomic) UIImage *polaroidImage;
 @property (strong, nonatomic) IBOutlet UILabel *title;
 @property (strong, nonatomic) IBOutlet UILabel *description;
+@property (weak, nonatomic) IBOutlet UIView *overlayView;
+
 
 
 - (void)shadePolaroidBackground;
 - (void)unshadePolaroidBackground;
 - (void)startDownloadingImage;
 - (UIImage*)imageByScalingAndCroppingForSize:(UIImage *)sourceImage targetSize:(CGSize)targetSize;
+- (void)updateOverlay:(CGFloat)xDistance yDistance:(CGFloat)yDistance;
+- (void)hideOverlay;
 
 @end

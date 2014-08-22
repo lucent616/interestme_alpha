@@ -16,10 +16,8 @@ inManagedObjectContext:(NSManagedObjectContext *)context
 {
     Polaroid *polaroid = nil;
     
-    NSString *imageURL = @"";
-    
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Polaroid"];
-    request.predicate = [NSPredicate predicateWithFormat:@"imageURL = %@", imageURL];
+    request.predicate = [NSPredicate predicateWithFormat:@"polaroid_ID = %@", photoDictionary[@"id"]];
     
     NSError *error;
     NSArray *matches = [context executeFetchRequest:request error:&error];
@@ -35,13 +33,13 @@ inManagedObjectContext:(NSManagedObjectContext *)context
         polaroid.title = [photoDictionary valueForKeyPath:@"title"];
         polaroid.polaroidDescription = [photoDictionary valueForKey:@"description"];
         polaroid.genre = [photoDictionary valueForKey:@"genre"];
-        polaroid.polaroid_ID = [[photoDictionary valueForKey:@"id"] integerValue];
+        polaroid.polaroid_ID = (int32_t)[[photoDictionary valueForKey:@"id"] integerValue];
         polaroid.sourceURL = [photoDictionary valueForKey:@"source_url"];
         
         
                            
         
-        //NSLog(@"Polaroid: %@", polaroid);
+        NSLog(@"New Polaroid: %@", polaroid);
 
         polaroid.image = [[NSData alloc] init];//Call some function to download image from URL?
         
@@ -49,6 +47,7 @@ inManagedObjectContext:(NSManagedObjectContext *)context
         polaroid.boringToMe = NO;
         polaroid.savedByMe = NO;
         polaroid.sentByMe = NO;
+        polaroid.viewed = NO;
         
         polaroid.numberOfPeopleBoredByThis = [[photoDictionary valueForKey:@"boring_count"] intValue];
         polaroid.numberOfPeopleInterestedInThis = [[photoDictionary valueForKey:@"interesting_count"] intValue];
@@ -57,6 +56,7 @@ inManagedObjectContext:(NSManagedObjectContext *)context
 
     } else {
         polaroid = [matches firstObject];
+        NSLog(@"Old Polaroid: %@", polaroid);
     }
     
     return polaroid;

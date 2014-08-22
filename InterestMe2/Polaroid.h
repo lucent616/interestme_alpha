@@ -1,8 +1,8 @@
 //
 //  Polaroid.h
-//  InterestMe2
+//  InterestMe
 //
-//  Created by Collin Wallace on 7/10/14.
+//  Created by Collin Wallace on 7/25/14.
 //  Copyright (c) 2014 Collin Wallace. All rights reserved.
 //
 
@@ -13,7 +13,9 @@
 
 @interface Polaroid : NSManagedObject
 
+@property (nonatomic, retain) NSString * author;
 @property (nonatomic) BOOL boringToMe;
+@property (nonatomic) NSTimeInterval dateTaken;
 @property (nonatomic, retain) NSString * genre;
 @property (nonatomic, retain) NSData * image;
 @property (nonatomic, retain) NSString * imageURL;
@@ -22,14 +24,13 @@
 @property (nonatomic) int32_t numberOfPeopleInterestedInThis;
 @property (nonatomic) int32_t numberOfTimesSaved;
 @property (nonatomic) int32_t numberOfTimesSent;
-@property (nonatomic) int64_t polaroid_ID;
+@property (nonatomic) int32_t polaroid_ID;
 @property (nonatomic, retain) NSString * polaroidDescription;
 @property (nonatomic) BOOL savedByMe;
 @property (nonatomic) BOOL sentByMe;
-@property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) NSString * sourceURL;
-@property (nonatomic, retain) NSString * author;
-@property (nonatomic) NSTimeInterval dateTaken;
+@property (nonatomic, retain) NSString * title;
+@property (nonatomic) BOOL viewed;
 @property (nonatomic, retain) NSSet *allUsersBoredByThisPolaroid;
 @property (nonatomic, retain) NSSet *allUsersInterestedByThisPolaroid;
 @property (nonatomic, retain) NSSet *allUsersThatSavedThisPolaroid;
