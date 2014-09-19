@@ -27,13 +27,7 @@
 #define POLAROID_HEIGHT_SCALE 0.85
 #define POLAROID_WIDTH_SCALE 0.95
 
-
 #pragma mark Properties
-
-- (void)didAddSubview:(UIView *)subview
-{
-    
-}
 
 - (UIImageView *)polaroidImageView
 {
@@ -52,8 +46,6 @@
     
     self.title.text = self.polaroid.title;
     self.description.text = self.polaroid.polaroidDescription;
-    
-
     
     [self.polaroidImageView sizeToFit];
     [self.spinner stopAnimating];
@@ -82,6 +74,7 @@
                     UIImage *image = [UIImage imageWithData:self.polaroid.image];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         self.polaroidImage = image;
+                        [self.spinner stopAnimating];
                         [self setNeedsDisplay];
                     });
                 }
@@ -101,8 +94,6 @@
 {
     CGSize targetSize = CGSizeMake(self.bounds.size.width* POLAROID_WIDTH_SCALE, self.bounds.size.height*POLAROID_HEIGHT_SCALE);
     
-    
-    //UIImage *polaroidImage = [self imageByScalingAndCroppingForSize:self.polaroidImage targetSize:targetSize];//WHERE I WANT TO TRY THE NEW RESIZING METHOD
     UIImage *polaroidImage = [UIImage imageToFitSize:self.polaroidImage size:targetSize method:MGImageResizeCrop];
     CGRect imageRect = self.bounds;
     imageRect.size.width = self.bounds.size.width * POLAROID_WIDTH_SCALE; //sets the image width to be the same as the view bounds

@@ -39,7 +39,7 @@ inManagedObjectContext:(NSManagedObjectContext *)context
         
                            
         
-        NSLog(@"New Polaroid: %@", polaroid);
+        //NSLog(@"New Polaroid: %@", polaroid);
 
         polaroid.image = [[NSData alloc] init];//Call some function to download image from URL?
         
@@ -56,7 +56,7 @@ inManagedObjectContext:(NSManagedObjectContext *)context
 
     } else {
         polaroid = [matches firstObject];
-        NSLog(@"Old Polaroid: %@", polaroid);
+        //NSLog(@"Old Polaroid: %@", polaroid);
     }
     
     return polaroid;

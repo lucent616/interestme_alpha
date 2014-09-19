@@ -87,71 +87,22 @@ BOOL resizeThumbnails = YES; //Turns thumbnail resizing on and off
 static int ySensitivity = 150; //Adjust how sensity the drag feature is to the users movement
 static int xSensitivity = 40;
 ////////////END OF ADJUSTMENT VALUES
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    //Check to see if the user has joined the application already, Ideally this would be in ViewDidLoad, but need to figure out a dispatch strategy with ViewDidAppear
-    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Information From Server"] != nil)
-    {
-        self.userInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Information From Server"];
-        self.userIdentification = [self.userInformation[@"userID"] intValue];
-        NSLog(@"This user has created an account");
-        NSLog(@"This users identification number is: %d", self.userIdentification);
-        //NSLog(@"%@",[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"][@"filterBank"]);
-
-    }
-    else
-    {
-//       NSLog(@"This user has never created an account and needs to create one");
-//        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//        UIViewController *loginVC = [storyboard instantiateViewControllerWithIdentifier:@"LoginViewController"];
-//        loginVC.modalPresentationStyle = UIModalPresentationFullScreen;
-//        [self presentViewController:loginVC animated:YES completion:nil];
-        NSLog(@"This user has never created an account and needs to create one");
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        UIViewController *tutorialVC = [storyboard instantiateViewControllerWithIdentifier:@"TutorialViewController"];
-        tutorialVC.modalPresentationStyle = UIModalPresentationFullScreen;
-        [self presentViewController:tutorialVC animated:YES completion:nil];
-        
-    }
-    
-    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] != nil)
-    {
-        NSLog(@"User is continuing a previous session");
-        NSLog(@"Photo bank at startup: %@", self.photoBank);
-
-    }
-    else
-    {
-        NSLog(@"This is a new session for this user");
-        [self.friendScoreLabel setHidden:YES];
-        [self.friendScoreDescription setHidden:YES];
-    }
-}
 
 - (void)viewDidLoad
 {   //Creates MOC and if one has not been created, then it observes until a database is created
     [super viewDidLoad];
     
+    [self checkForPreviousSession:nil];
     
-    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"interestMe_Navigation_Header.png"]];
-    
-    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] == nil)
-    {
-        [self.friendScoreLabel setHidden:YES];
-        [self.friendScoreDescription setHidden:YES];
-    }
-    else
-    {
-
-    }
+//    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] == nil)
+//    {
+//        [self.friendScoreLabel setHidden:YES];
+//        [self.friendScoreDescription setHidden:YES];
+//    }
+//    else
+//    {
+//        
+//    }
     
     CDWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
     appDelegate.draggableViewController = self;
@@ -165,7 +116,7 @@ static int xSensitivity = 40;
         
         [self stagePolaroids];
         //NSLog(@"photoBank: %@", self.photoBank);
-
+        
     }
     else
     {
@@ -176,7 +127,6 @@ static int xSensitivity = 40;
                                                                         self.managedObjectContext = polaroidDB.managedObjectContext;
                                                                         
                                                                         [self stagePolaroids];
-                                                                        NSLog(@"Inside the MOC Block");
                                                                         
                                                                         //Retrieve thumbnail information from previous session
                                                                         if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] != nil)
@@ -223,21 +173,73 @@ static int xSensitivity = 40;
                                                                                 self.polaroidThumbnailSourceURL = each_polaroid.sourceURL;
                                                                             }
                                                                             
-                                                                            
                                                                             //[self.view setNeedsDisplay];
                                                                             
                                                                             //Pretend that a new friend score is being calculated
                                                                             [self calculateAndSetInterestMeScore]; //currently hidden
                                                                             self.friendScoreLabel.text = [NSString stringWithFormat:@"%d", self.friendScore];
                                                                         }
-
+                                                                        
                                                                         [[NSNotificationCenter defaultCenter] removeObserver:observer];
                                                                     }];
     }
-    
+    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"interestMe_Navigation_Header.png"]];
     [self collectPolaroidGenres];
     
 }
+
+- (void)checkForPreviousSession:(void (^)(BOOL success))completionHandler
+{
+    //Check to see if the user has joined the application already, if not, show them the tutorial which leads to signup
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Information From Server"] != nil)
+    {
+        self.userInformation = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Information From Server"];
+        self.userIdentification = [self.userInformation[@"userID"] intValue];
+        NSLog(@"This user has created an account");
+        NSLog(@"This users identification number is: %d", self.userIdentification);
+        //NSLog(@"%@",[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"User Filter Preferences"][@"filterBank"]);
+    }
+    else
+    {
+        dispatch_queue_t tutorialQueue = dispatch_queue_create("Tutorial Loading", NULL);
+        dispatch_async(tutorialQueue, ^{
+            NSLog(@"This user has never created an account and needs to create one");
+            UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            UIViewController *tutorialVC = [storyboard instantiateViewControllerWithIdentifier:@"TutorialViewController"];
+            tutorialVC.modalPresentationStyle = UIModalPresentationFullScreen;
+            [self presentViewController:tutorialVC animated:YES completion:nil];
+            if(completionHandler) dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"Tutorial screen openned");
+                completionHandler(YES);
+            });
+        });
+    }
+    
+    if ([[NSUserDefaults standardUserDefaults] dictionaryForKey:@"savedPreviousSession"] != nil)
+    {
+        NSLog(@"User is continuing a previous session");
+        //NSLog(@"Photo bank at startup: %@", self.photoBank);
+        
+    }
+    else
+    {
+        NSLog(@"This is the first session for this user");
+        [self.friendScoreLabel setHidden:YES];
+        [self.friendScoreDescription setHidden:YES];
+    }
+}
+
+//- (void)viewWillAppear:(BOOL)animated
+//{
+//    [super viewWillAppear:animated];
+//}
+//
+//- (void)viewDidAppear:(BOOL)animated
+//{
+//    [super viewDidAppear:animated];
+//    
+//}
+
 
 - (void)collectPolaroidGenres
 {
@@ -352,8 +354,8 @@ static int xSensitivity = 40;
         
         //Test script
         //NSMutableArray *photoBankObjectIDs = [[NSMutableArray alloc]   init];
-        NSLog(@"Total number of polaroids in photo bank is: %d", (int32_t)[_photoBank count]);
-        NSLog(@"Photo Bank contents: %@", _photoBank);
+        //NSLog(@"Total number of polaroids in photo bank is: %d", (int32_t)[_photoBank count]);
+        //NSLog(@"Photo Bank contents: %@", _photoBank);
         //NSLog(@"The contents of the photo bank are: %@", photoBankObjectIDs);
     }
     
@@ -432,11 +434,11 @@ static int xSensitivity = 40;
     NSError *error;
     NSFetchRequest *request  = [NSFetchRequest fetchRequestWithEntityName:@"Polaroid"];
     request.predicate = [NSPredicate predicateWithFormat:@"polaroid_ID = %d", polaroidID];
-    NSLog(@"Predicate for retrieving Thumbnail: %@", request.predicate);
+    //NSLog(@"Predicate for retrieving Thumbnail: %@", request.predicate);
     NSMutableArray *myPolaroid = [[self.managedObjectContext executeFetchRequest:request error:&error] mutableCopy];
     
     NSLog(@"error: %@", error);
-    NSLog(@"Polaroid returned by findMyPolaroid: %@",myPolaroid);
+    //NSLog(@"Polaroid returned by findMyPolaroid: %@",myPolaroid);
     return myPolaroid;
 }
 
@@ -533,7 +535,7 @@ static int xSensitivity = 40;
  
  */
     
-    NSLog(@"%@ %@ %@", self.frontPolaroidCardView.polaroid.title, self.middlePolaroidCardView.polaroid.title, self.backPolaroidCardView.polaroid.title);
+    //NSLog(@"%@ %@ %@", self.frontPolaroidCardView.polaroid.title, self.middlePolaroidCardView.polaroid.title, self.backPolaroidCardView.polaroid.title);
     
     self.currentPolaroidImageURL = self.middlePolaroidCardView.polaroid.imageURL;
     self.currentPolaroidTitle = self.middlePolaroidCardView.polaroid.title;
@@ -634,7 +636,7 @@ static int xSensitivity = 40;
 //            //If the image is moved more than 75 pixels in the x-direction, the image is removed from the view and
 //            //a method WILL BE triggered to add the image to an array of boringImages or interestMeImages
                 
-            //Swipe Right - Image is interesting
+//Swipe Right - Image is interesting
             if (self.xDistance > 75 && self.yDistance < ySensitivity)
             {
                 [UIView animateWithDuration:0.2 delay:0.00 options:UIViewAnimationOptionCurveEaseOut
@@ -647,6 +649,7 @@ static int xSensitivity = 40;
 
                                  }
                                  completion:^(BOOL finished) {
+                                    NSLog(@"Follow branch with polariods with genre %@", self.frontPolaroidCardView.polaroid.genre);
                                      self.frontPolaroidCardView.polaroid.interestingToMe = YES;
                                      self.frontPolaroidCardView.polaroid.savedByMe = YES;
                                      
@@ -661,6 +664,7 @@ static int xSensitivity = 40;
                                      [self interateTheNextPolaroid];
                                      self.remainingPolaroids--;
                                      [self trackRemainingPolaroids];
+
                                      
                                  }
                  ];
@@ -668,7 +672,7 @@ static int xSensitivity = 40;
                 break;
             }
             
-            //Swipe Left - Image is boring
+//Swipe Left - Image is boring
             else if (self.xDistance < - 75 && self.yDistance < ySensitivity)
             {
                 [UIView animateWithDuration:0.2 delay:0.00 options:UIViewAnimationOptionCurveEaseOut
@@ -681,6 +685,7 @@ static int xSensitivity = 40;
                                      
                                  }
                                  completion:^(BOOL finished) {
+                                     NSLog(@"Find a new branch");
                                      //self.boringToMe = YES;
                                      self.frontPolaroidCardView.polaroid.boringToMe = YES;
                                      self.frontPolaroidCardView.polaroid.image = nil;
@@ -694,6 +699,7 @@ static int xSensitivity = 40;
                                      [self interateTheNextPolaroid];
                                      self.remainingPolaroids--;
                                      [self trackRemainingPolaroids];
+                                     
 
                                  }
                  ];
@@ -701,7 +707,7 @@ static int xSensitivity = 40;
                 break;
             }
 
-            //Swipe Up - Send Image
+//Swipe Up - Send Image
             if (self.yDistance < - 15 && self.xDistance < xSensitivity)
             {
                 [self resetViewPositionAndTransformations];
@@ -804,11 +810,11 @@ static int xSensitivity = 40;
 - (IBAction)tapOnGlobalView:(UITapGestureRecognizer *)sender
 {
     self.navigationController.navigationBar.hidden = NO;
-
 }
 
 - (void)tapPolaroidView:(id)sender
 {
+    NSLog(@"Polaroid View was Tapped!");
     FullScreenViewController *ivc = [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"FullScreenViewID"];
     [[self navigationController] setNavigationBarHidden:YES animated:NO];
     ivc.imageURL =  [NSURL URLWithString:self.currentPolaroidImageURL];
@@ -833,7 +839,6 @@ static int xSensitivity = 40;
     
     // present
     [self presentViewController:navigationController animated:YES completion:nil];
-    
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender

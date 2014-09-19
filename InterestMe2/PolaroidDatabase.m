@@ -150,10 +150,10 @@
     if(!lastFetchedPolaroidId)
         lastFetchedPolaroidId = [NSNumber numberWithInt:0];
     
-    int fetchLimit = 5;
+    int fetchLimit = 20;
 
     NSString *fetchURL = [NSString stringWithFormat:@"http://thawing-ocean-9569.herokuapp.com/polaroids/%@/%d",lastFetchedPolaroidId,fetchLimit];
-    NSLog(@"%@", fetchURL);
+    NSLog(@"Fetching polaroid data from the server");
     NSURL *url = [[NSURL alloc] initWithString:fetchURL];
     
     dispatch_queue_t fetchQueue = dispatch_queue_create("Polaroid Polaroid Fetch", NULL);
@@ -166,7 +166,7 @@
 
             NSNumber *tempID = [NSNumber numberWithInt:0];
             
-            //NSLog(@"Polaroids fetched from the server: %@", self.polaroidArrayFromServer);
+            NSLog(@"Polaroids fetched from the server: %@", self.polaroidArrayFromServer);
             
             for (NSDictionary *photoDictionary in _polaroidArrayFromServer)
             {

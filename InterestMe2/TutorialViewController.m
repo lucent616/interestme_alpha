@@ -26,7 +26,9 @@
                     @"Swipe up if you want to pass it on.",
                     //@"Email, SMS or Post to your favorite social networks.",
                     @"Tap once to see it full screen.",
+                    @"",
                     @"Tap twice to learn more.",
+                    @"",
                     @"Anything you like we will save for you.",
                     @"It's that simple. Find something that InterestYou!"
                     //@"settings"
@@ -36,7 +38,9 @@
                     @"left",
                     @"up",
                     //@"repost",
+                    @"single_tap",
                     @"fullscreen",
+                    @"double_tap",
                     @"webview",
                     @"collection",
                     //@"settings",

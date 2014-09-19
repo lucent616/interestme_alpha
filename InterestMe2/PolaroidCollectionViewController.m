@@ -39,17 +39,20 @@
 #pragma mark - DataSource methods
 
 // OPTIONAL: Number of sections
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
     return 1; //default
 }
 
 // REQUIRED: Number of items in section. (Number of thumbnails)
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
     return self.polaroidsSavedByMe.count;
 }
 
 // REQUIRED: Set up each cell
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
     // Cells that goes off screen are enqueued into a reuse pool
     // The method below looks for reuseable cell
     PolaroidCollectionViewCell *myCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"PolaroidCell" forIndexPath:indexPath];
@@ -59,15 +62,17 @@
     // IndexPath specifies the section and row of a cell. Here, row is equivalent to the index.
     // Set the image of the cell.
     //NSLog(@"path: %d", indexPath.row);
+    
     Polaroid *polaroid = self.polaroidsSavedByMe[indexPath.row];
     
     //TRYING TO RESIZE CELLS
-//    float cellHeight = myCell.imageView.image.size.height;
-//    float cellWidth = myCell.imageView.image.size.width;
-//    CGSize targetCellSize = CGSizeMake(cellWidth, cellHeight);
-//    UIImage *resizedCellImage = [UIImage imageToFitSize:[UIImage imageWithData:polaroid.image] size:targetCellSize method:MGImageResizeCrop];
-    //myCell.imageView.image = resizedCellImage;
-    myCell.imageView.image = [UIImage imageWithData:polaroid.image]; //THIS IS WHERE I NEED TO CHANGE THE RESIZING METHOD FOR THE TARGET CELLS
+    float cellHeight = 170;
+    float cellWidth = 170;
+    CGSize targetCellSize = CGSizeMake(cellWidth, cellHeight);
+    UIImage *resizedCellImage = [UIImage imageToFitSize:[UIImage imageWithData:polaroid.image] size:targetCellSize method:MGImageResizeCrop];
+    myCell.imageView.image = resizedCellImage;
+    
+    //myCell.imageView.image = [UIImage imageWithData:polaroid.image]; //THIS IS WHERE I NEED TO CHANGE THE RESIZING METHOD FOR THE TARGET CELLS
     return myCell;
 }
 

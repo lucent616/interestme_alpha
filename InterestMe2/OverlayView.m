@@ -26,10 +26,6 @@
 
 - (void)setMode:(GGOverlayViewMode)mode
 {
-    //if (_mode == mode) return;
-
-    //_mode = mode;
-    
     if (mode == GGOverlayViewModeLeft)
     {
         self.imageView.image = [UIImage imageNamed:@"overlay_boring.png"];
@@ -47,8 +43,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    //Determines the location and size of the overlay when the image is being dragged left or right
-    //self.imageView.frame = CGRectMake(10, 10, 175, 175);
+
 }
 
 @end

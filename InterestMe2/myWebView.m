@@ -7,6 +7,7 @@
 //
 
 #import "myWebView.h"
+#import "DraggableViewController.h"
 
 @interface myWebView ()
 
@@ -38,8 +39,25 @@
     NSLog(@"Return to Draggable View");
     // dismiss
      [self dismissViewControllerAnimated:YES completion:nil];
+    
+    //DraggableViewController *dvc = [self.storyboard instantiateViewControllerWithIdentifier:@"DraggableView"];
+    
+    //[self presentViewController:dvc animated:YES completion:nil];
+    
+    //UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"DraggableView" bundle: nil];
+    
+    
+    
+    //[self.navigationController pushViewController:viewWithTag animated:YES];
+    
+    
+//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+//    UIViewController *tutorialVC = [storyboard instantiateViewControllerWithIdentifier:@"TutorialViewController"];
+//    tutorialVC.modalPresentationStyle = UIModalPresentationFullScreen;
+//    [self presentViewController:tutorialVC animated:YES completion:nil];
+//    
 }
- 
+
 #pragma mark - Optional UIWebViewDelegate delegate methods
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {

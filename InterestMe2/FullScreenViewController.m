@@ -128,18 +128,18 @@
     self.fullScreenTitleLabel.text = self.fullScreenTitle;
     self.fullScreenDescriptionLabel.text = self.fullScreenDescription;
     
-    UITapGestureRecognizer *doubleTapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap)];
+    //UITapGestureRecognizer *doubleTapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap)];
     
     UITapGestureRecognizer *singleTapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap)];
     
-    [singleTapGR requireGestureRecognizerToFail : doubleTapGR];
-    [doubleTapGR setDelaysTouchesBegan : YES];
+    //[singleTapGR requireGestureRecognizerToFail : doubleTapGR];
+    //[doubleTapGR setDelaysTouchesBegan : YES];
     [singleTapGR setDelaysTouchesBegan : YES];
     
-    [doubleTapGR setNumberOfTapsRequired : 2];
+    //[doubleTapGR setNumberOfTapsRequired : 2];
     [singleTapGR setNumberOfTapsRequired : 1];
     
-    [self.scrollView addGestureRecognizer : doubleTapGR];
+    //[self.scrollView addGestureRecognizer : doubleTapGR];
     [self.scrollView addGestureRecognizer : singleTapGR];
     
 }

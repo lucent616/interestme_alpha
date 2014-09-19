@@ -7,7 +7,7 @@
         <!--Draggable View Controller - InterestMe-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="DraggableViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DraggableView" id="vXZ-lx-hvc" customClass="DraggableViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -73,11 +73,17 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" id="Cc5-Re-fXR">
+                                        <rect key="frame" x="130" y="185" width="20" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="color" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </activityIndicatorView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
                                     <outlet property="description" destination="MfT-Qi-9X6" id="vDz-Ia-bZx"/>
                                     <outlet property="overlayView" destination="bUC-r8-2Kq" id="VFM-bd-6b8"/>
+                                    <outlet property="spinner" destination="Cc5-Re-fXR" id="Nfx-Ec-bY1"/>
                                     <outlet property="title" destination="esJ-Ge-OSE" id="cbj-ot-Us8"/>
                                 </connections>
                             </view>
@@ -104,11 +110,17 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" id="YW5-Mz-CZb">
+                                        <rect key="frame" x="130" y="185" width="20" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="color" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </activityIndicatorView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
                                     <outlet property="description" destination="P8F-Rn-SjL" id="iTw-LK-oen"/>
                                     <outlet property="overlayView" destination="Kq4-Og-toz" id="ogd-sA-8M1"/>
+                                    <outlet property="spinner" destination="YW5-Mz-CZb" id="za9-aF-1AY"/>
                                     <outlet property="title" destination="Wfd-5n-UyI" id="Qot-nZ-meS"/>
                                 </connections>
                             </view>
@@ -135,11 +147,17 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" id="Orw-I2-oxm">
+                                        <rect key="frame" x="130" y="185" width="20" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="color" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </activityIndicatorView>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
                                     <outlet property="description" destination="Zga-Nc-h6U" id="mwS-YH-8rh"/>
                                     <outlet property="overlayView" destination="y6I-SV-YUn" id="evT-x1-bl6"/>
+                                    <outlet property="spinner" destination="Orw-I2-oxm" id="Leq-iM-yQh"/>
                                     <outlet property="title" destination="6tC-yy-HdJ" id="3bC-qO-xCx"/>
                                 </connections>
                             </view>
@@ -256,7 +274,7 @@
                     <navigationItem key="navigationItem" id="rA6-Qi-gqN">
                         <barButtonItem key="leftBarButtonItem" title="InterestMe" id="1xT-gD-MBR">
                             <connections>
-                                <action selector="returnToDraggableView:" destination="3oF-MJ-YkD" id="pHc-RN-2Pa"/>
+                                <action selector="returnToDraggableView:" destination="3oF-MJ-YkD" id="iIe-LU-yvq"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
